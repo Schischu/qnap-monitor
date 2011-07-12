@@ -40,7 +40,16 @@ var settingsObj =
 			SettingsManager.loadFile();								// Get all into memory.
 			var fields =Tabs.getElementsByTagName("input");		// Get list of the things to display.
 			for (var field = 0; field< fields.length; field++)	// Write memory -> display.
-				fields[field].value = SettingsManager.getValue(this.GroupName, fields[field].id, fields[field].value);
+				if (fields[field].type == "checkbox") {
+					value = SettingsManager.getValue(this.GroupName, fields[field].id, fields[field].checked);
+					debugOut("settings: " + fields[field].id + " = " + value);
+					if (value == "true")
+						fields[field].checked = value;
+					else
+						fields[field].checked = null;
+				}
+				else
+					fields[field].value = SettingsManager.getValue(this.GroupName, fields[field].id, fields[field].value);
 		}
 		catch(error)
 		{
@@ -63,7 +72,10 @@ var settingsObj =
 			//~ debugOut("settingsObj.saveSettings");
 			var fields = Tabs.getElementsByTagName("input");
 			for (var field = 0; field< fields.length; field++)
-				SettingsManager.setValue(this.GroupName, fields[field].id, fields[field].value);
+				if (fields[field].type == "checkbox")
+					SettingsManager.setValue(this.GroupName, fields[field].id, fields[field].checked);
+				else
+					SettingsManager.setValue(this.GroupName, fields[field].id, fields[field].value);
 		}
 		catch(error)
 		{

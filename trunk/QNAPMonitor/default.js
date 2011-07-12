@@ -249,16 +249,35 @@ function shutDownComplete( status, text)
 /* Extraction and processing of data from the NAS web server
  * -------------------------------------------------------------------------------------------------------------------
  */
+ 
+var old_user = "";
+var old_pwd = "";
+var old_ssl = "";
+
 function login( andThen )	// input is callback method.
 {
+	user = SettingsManager.getValue(settingsObj.GroupName, "account");
+	pwd = SettingsManager.getValue(settingsObj.GroupName, "password");
+	ssl = SettingsManager.getValue(settingsObj.GroupName, "NASSecureLogin");
+	
+	if(user != old_user || pwd != old_pwd || ssl != old_ssl) {
+		qnapSid = qnapSidNull;
+		debugOut("login: " + "changed");
+	}
+	
 	if (qnapSid != qnapSidNull)
 	{
 		andThen(200, null)
 		return true;
 	}
-	user = SettingsManager.getValue(settingsObj.GroupName, "account");
+	
+	debugOut("login: " + "do");
+	
+	old_user = user;
+	old_pwd = pwd;
+	old_ssl = ssl;
+	
 	user = encodeURIComponent(user);
-	pwd = SettingsManager.getValue(settingsObj.GroupName, "password");
 	pwd = encodeURIComponent(ezEncode(utf16to8(pwd)));
 	url = '/cgi-bin/authLogin.cgi?count=' + Math.random() + '&user=' + user + '&pwd=' + pwd + '&admin=1'
 	
@@ -284,7 +303,7 @@ function loginComplete(text)
 function getNasStatus( status, text ) // Input is content of previous response (for callbacks) or null for straight calls - it's ignored.
 {
 	//debugOut("getNasStatus: " + status);
-	debugOut("getNasStatus: " + text);
+	debugOut("getNasStatus: (" + status + ") " + text);
 	displayObject.displayMessage(status, "log on");
 	//displayObject.displayMessage(200, status);	// Login failed, set error code and terminate.
 	if (status == 200)				// Response received ok, but did the login work ok?
