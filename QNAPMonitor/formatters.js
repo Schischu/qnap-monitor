@@ -42,8 +42,8 @@ function parseNetworkData( sourceText )
 {
 	html = "";
 	//                  TITLE,       VAR,             FORMAT, PATTERN, STYLE,                          TOOLTIP
-	html += buildString("IP",    v_eth0Ipaddress, "text", "",      "",                             "eth0 Ip Address");
-	html += buildString("GW",   v_eth0Gateway,   "text", "",      "",                             "eth0 Gateway");
+	html += buildString("IpAddr",    v_eth0Ipaddress, "text", "",      "",                             "eth0 Ip Address");
+	html += buildString("Gateway",   v_eth0Gateway,   "text", "",      "",                             "eth0 Gateway");
 	html += buildString("MAC",       v_eth0Hwaddr,    "text", "",      "",                             "eth0 Hw Address");
 	html += buildString("SpeedType", v_eth0Speedtype, "text", "",      "color:Khaki; padding-top:2px", "eth0 Speedtype");
 	html += buildString("Speed",     v_eth0_speed,    "text", "",      "color:Khaki",                  "eth0 Speed");
@@ -60,31 +60,31 @@ function parseServerData()
 {
 	html = "<div style='overflow-y:auto; height:158px; '; ";
 	//                  TITLE,       VAR,             FORMAT, PATTERN, STYLE
-	html += buildString("MS Server",       v_msServerEnabled,     "bool", "", "");
+	html += buildString("MS Server",       v_msServerEnabled,     "bool", "1", "");
 	html += buildString("&nbsp;&nbsp;Workgroup",     v_workgroup,           "text", "", "");
 	html += buildString("&nbsp;&nbsp;Type",          v_msServertype,        "text", "", "");
-	html += buildString("WINS",            v_winsEnabled,         "bool", "", "");
-	html += buildString("Domain",          v_domainEnabled,       "text", "", "");
+	html += buildString("WINS",            v_winsEnabled,         "bool", "1", "");
+	html += buildString("Domain",          v_domainEnabled,       "bool", "1", "");
 	html += buildString("AppleTalk",       v_appletalkEnabled,    "bool", "", "");
 	html += buildString("&nbsp;&nbsp;AppleZone",     v_appleZone,           "text", "", "");
-	html += buildString("NFS",             v_nfsEnabled,          "bool", "", "");
-	html += buildString("WebFS",           v_webfsEnabled,        "bool", "", "");
-	html += buildString("FTP",             v_ftpEnabled,          "bool", "", "");
+	html += buildString("NFS",             v_nfsEnabled,          "bool", "1", "");
+	html += buildString("WebFS",           v_webfsEnabled,        "bool", "1", "");
+	html += buildString("FTP",             v_ftpEnabled,          "bool", "1", "");
 	html += buildString("&nbsp;&nbsp;Port",          v_ftpPort,             "text", "", "");
 	html += buildString("&nbsp;&nbsp;Max. User",     v_ftpMaxinstances,     "text", "", "");
-	html += buildString("QPhoto",          v_qphotoEnabled,       "bool", "", "");
-	html += buildString("iTunes",          v_itunesEnabled,       "bool", "", "");
-	html += buildString("Upnp",            v_upnpEnabled,         "bool", "", "");
-	html += buildString("Download",        v_downloadEnabled,     "bool", "", "");
-	html += buildString("WebServer",       v_webserverEnabled,    "bool", "", "");
+	html += buildString("QPhoto",          v_qphotoEnabled,       "bool", "1", "");
+	html += buildString("iTunes",          v_itunesEnabled,       "bool", "1", "");
+	html += buildString("Upnp",            v_upnpEnabled,         "bool", "1", "");
+	html += buildString("Download",        v_downloadEnabled,     "bool", "1", "");
+	html += buildString("WebServer",       v_webserverEnabled,    "bool", "1", "");
 	html += buildString("&nbsp;&nbsp;Port",          v_webserverPort,       "text", "", "");
-	html += buildString("RegGlobals",      v_regGlobalsEnabled,   "bool", "", "");
-	html += buildString("DDNS",            v_ddnsEnabled,         "bool", "", "");
-	html += buildString("MySql",           v_mysqlEnabled,        "bool", "", "");
+	html += buildString("RegGlobals",      v_regGlobalsEnabled,   "bool", "1", "");
+	html += buildString("DDNS",            v_ddnsEnabled,         "bool", "1", "");
+	html += buildString("MySql",           v_mysqlEnabled,        "bool", "1", "");
 	html += buildString("&nbsp;&nbsp;Networking",    v_mysqlNetworking,     "bool", "", "");
-	html += buildString("Sys Port",        v_sysPort,             "text", "", "");
-	html += buildString("QSurveillance",   v_qsurveillanceEnable, "bool", "", "");
-	html += buildString("Bonjour Service", v_bServiceEnable,      "bool", "", "");
+	html += buildString("Sys Port",        v_sysPort,             "text", "1", "");
+	html += buildString("QSurveillance",   v_qsurveillanceEnable, "bool", "1", "");
+	html += buildString("Bonjour Service", v_bServiceEnable,      "bool", "1", "");
 	html += buildString("&nbsp;&nbsp;Port",          v_servicePort,         "text", "", "");
 	html += "</div>";
 	return html
