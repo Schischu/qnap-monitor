@@ -10,14 +10,17 @@
 <script type="text/javascript" src="graph.js" ></script>
 <script type="text/javascript" src="lib/SettingsManager.js"></script>
 <script type="text/javascript" src="default.js" ></script>
-<script type="text/javascript">debugger;</script>
+<script type="text/javascript" src="values.js" ></script>
 <style>
 v\:* {behavior: url(#default#VML); }
 </style>
+
+
+
 </head>
 <body>
 	<g:background id="backgroundImage" src="url(images/black_back.png)"
-        style="position: absolute;top: 0px; z-index: 0; left:0px; width: 130px; height: 180px;"></g:background>
+        style="position: absolute;top: 0px; z-index: 0; left:0px; width: 130px; height: 200px;"></g:background>
 	<a href="#" onClick="return true" ><h1 id="GadgetName" onmouseover="displayObject.displayToolTip('reloads gadget');" onmouseout="displayObject.clearToolTip();" >reload</h1></a>
 	<a id="NasImage" onmouseover="displayObject.displayToolTip('click for web page');" onmouseout="displayObject.clearToolTip();" ></a>
 	<div id="BlueFlasher"></div>
@@ -40,6 +43,7 @@ v\:* {behavior: url(#default#VML); }
 	</div>
 	<div id="Buttons">
 		<a id="Refresh" href="#" onClick="return login( getNasStatus );"  onmouseover="displayObject.displayToolTip('refresh stats');"  onmouseout="displayObject.clearToolTip();" ></a>
+		<a id="Wake" href="#" onClick="return commandNas(null, 'wake NAS?', 'doWakeup' );" onmouseover="displayObject.displayToolTip('wake NAS');" onmouseout="displayObject.clearToolTip();" ></a>
 		<a id="Restart" href="#" onClick="return commandNas(null, 'restart NAS?', 'doRestart' );" onmouseover="displayObject.displayToolTip('restart NAS');" onmouseout="displayObject.clearToolTip();" ></a>
 		<a id="ShutDown" href="#" onClick="return commandNas(null, 'shut down NAS?', 'doShutdown');" onmouseover="displayObject.displayToolTip('shutdown NAS');" onmouseout="displayObject.clearToolTip();" ></a>
 	</div>

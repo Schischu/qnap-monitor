@@ -32,21 +32,39 @@ function debugOut(msg)
 
 
 function extractXMLValue( fieldName, fromThis)
+{
+	try
 	{
-		//debugOut("extractPageValue: "+fromThis);
 		text = fromThis.replace(/\s|\r\n/g,"");	// Strip all whitespace and carriage returns.
 		debugOut("extractPageValue: "+text);
-		try
-		{
-			//var regEx = "(?:" +fieldName +":.*?<strong>&nbsp;)([^<]*)";
-			var regEx = '(?:' + fieldName +'><!\\[CDATA\\[)([^\\]]*)';
-		
-			text.match(regEx);
-			debugOut("extractPageValue: "+RegExp.$1);
-		}
-		catch(error)
-		{
-			debugOut("extractPageValue: "+error.name+" - "+error.message);
-		}
-		return RegExp.$1;		// GLOBAL
+		//var regEx = "(?:" +fieldName +":.*?<strong>&nbsp;)([^<]*)";
+		var regEx = '(?:' + fieldName +'><!\\[CDATA\\[)([^\\]]*)';
+	
+		text.match(regEx);
+		debugOut("extractPageValue: "+RegExp.$1);
 	}
+	catch(error)
+	{
+		debugOut("extractPageValue: "+error.name+" - "+error.message);
+	}
+	return RegExp.$1;		// GLOBAL
+}
+
+function extractXMLValue2( fieldName, fromThis)
+{
+	try
+	{
+		text = fromThis.replace(/\s|\r\n/g,"");	// Strip all whitespace and carriage returns.
+		debugOut("extractPageValue: "+text);
+		//var regEx = "(?:" +fieldName +":.*?<strong>&nbsp;)([^<]*)";
+		var regEx = '(?:' + fieldName +'>)([^<]*)';
+	
+		text.match(regEx);
+		debugOut("extractPageValue: "+RegExp.$1);
+	}
+	catch(error)
+	{
+		debugOut("extractPageValue: "+error.name+" - "+error.message);
+	}
+	return RegExp.$1;		// GLOBAL
+}

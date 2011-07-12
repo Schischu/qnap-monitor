@@ -45,7 +45,8 @@ function StateObject(nasCommand, nasArgs, output, paneName, formatter, pattern, 
 var state;
 var stateTable =
 [
-	new StateObject("/cgi-bin/management/manaRequest.cgi", "subfunc=netinfo", 	null, 					null, 						formatStatus, 	null, false),
+	new StateObject("/cgi-bin/management/manaRequest.cgi", "subfunc=netinfo", 	null, 					null, 						formatNetinfo, 	null, false),
+	new StateObject("/cgi-bin/management/manaRequest.cgi", "subfunc=sysinfo", 	null, 					null, 						formatSysinfo, 	null, false),
     // The following aren't available from 1.06 firmware onwards...
 	//~ new StateObject("/proc/version",	 	"<p style='padding-top:2px; color:Khaki'>Version: {0} </p>", 	"OsData", null, null, true ),
 	//~ new StateObject("/proc/uptime", 	 	"<p style='padding-top:5px'>Up time: {0} </p>",  				"StatusData", formatUptime, null, true ),
@@ -178,8 +179,10 @@ function commandNas(	flag,			// prompt (default)  or cancel (false)  or do it (t
 				displayObject.clearMessage();		// remove prompt.
 				if ( command == "doShutdown" )		// Kind of nasty but you can't just pass the "command" as a parameter.
 					doShutdown(0,"");
-				else
+				else if ( command == "doRestart" )
 					doRestart(0,"");
+				else if ( command == "doWakeup" )
+					doWakeup(0,"");
 				break;
 			case false:
 				displayObject.displayMessage( 200, "cancelled");		// Tell them it cancelled ok.
@@ -196,6 +199,30 @@ function commandNas(	flag,			// prompt (default)  or cancel (false)  or do it (t
 	}
 	return false;	// Don't refresh the whole page!
 }
+
+function doWakeup( status, text )
+{
+	debugOut("doWakeup");
+	
+	mac = SettingsManager.getValue( settingsObj.GroupName, "NASMACaddress" );
+	ip = SettingsManager.getValue( settingsObj.GroupName, "NASaddress" );
+	try {
+		var objsh = new ActiveXObject("WScript.Shell");
+		debugOut("doWakeup: " + "1");
+		var line = '\"' + System.Gadget.path + '\\bin\\mc-wol.exe\" ' + mac
+		debugOut("doWakeup: " + "2");
+		line = line + ' /a ' + ip;
+		debugOut("doWakeup: " + line);
+		objsh.run(line, 0);
+		debugOut("doWakeup: " + "done");
+	}
+	catch(error)
+	{
+		debugOut("doWakeup: "+error.name+" - "+error.message);
+	}
+	//nasObject.makeServerRequest( "/cgi-bin/restart.cgi",  "GET", restartComplete, null ); 	// Tell it to restart!
+}
+
 // From 1.06 onwards you have to log in first, then execute these commands.. so this is the login response handler.
 function doRestart( status, text )
 {
@@ -263,10 +290,11 @@ function getNasStatus( status, text ) // Input is content of previous response (
 	if (status == 200)				// Response received ok, but did the login work ok?
 	{
 		if (text != null) {
-			loginComplete(text);
+			
 			text = text.replace(/\s|\r\n/g,"");	// Strip all whitespace and carriage returns.
 			if ( text.indexOf("errorValue") == -1 )		// It's the same string for both NAS types.
 			{
+				loginComplete(text);
 	            /* Logged into something... It could be:
 				 * (a) "<TITLE>Conceptronic CH3SNAS</TITLE>"; or
 				 * (b)  a DNS323 in which case the title is the device name set by user, but it's
@@ -325,6 +353,9 @@ function processStateTable( status, textResp)
 				System.Gadget.document.getElementById( stateTable[state].paneName ).innerHTML += stateTable[state].output.replace("{0}", textResp );	// Output results.
 
 			goToNextState();
+		}
+		else {
+			qnapSid = qnapSidNull;
 		}
 		// Stop here if intermediate command fails.
 	}

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <gadget>
     <name>QNAP Monitor</name>
-    <version>1.0</version>
+    <version>1.1</version>
     <author name="Schischu">
 		<info url="google.de" />
     </author>
-    <copyright>&#169;Schischu 2010</copyright>
+    <copyright>&#169;phil wigglesworth(2009) and Schischu(2010)</copyright>
     <description>Monitor and control multiple aspects of QNAP NAS.</description>
 	<icons>
 		<icon height="50" width="50" src="images/both.png" />

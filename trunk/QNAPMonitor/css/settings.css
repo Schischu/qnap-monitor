@@ -1,8 +1,8 @@
 body { width:280px; height:190px; margin:0; padding:0; font-family:verdana; font-size:10px; }
 
 #comms p {width:130px;  text-align:right; margin-top:5px; margin-left:5px;float:left; clear:left}
-#comms input {width:100px; }
-#display p {width:200px;  text-align:right; margin-top:5px; margin-left:5px;float:left; clear:left}
+#comms input {width:112px; }
+#display p {width:230px;  text-align:right; margin-top:5px; margin-left:5px;float:left; clear:left}
 #display input {width:30px; }
 ul {margin:0px}
 
