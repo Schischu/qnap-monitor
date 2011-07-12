@@ -27,11 +27,11 @@
 function StateObject(nasCommand, nasArgs, output, paneName, formatter, pattern, dns323only)
 {
 	this.nasCommand = nasCommand;	// Thing to send to the NAS
-	this.nasArgs = nasArgs;	// Thing to send to the NAS
+	this.nasArgs = nasArgs;			// Thing to send to the NAS
 	this.output = output;			// Format string for output.
 	this.paneName = paneName;		// Name of the pane to display this on.
-	this.formatter = formatter;	// Format routine if special formatting required.
-	this.pattern = pattern;		// Search pattern (use to search input).
+	this.formatter = formatter;		// Format routine if special formatting required.
+	this.pattern = pattern;			// Search pattern (use to search input).
 	this.dns323only = dns323only; 	// Everything is run for the DNS-323 (for now). Anything with this flag set is disabled for other devices.
 }
 
@@ -43,22 +43,14 @@ function StateObject(nasCommand, nasArgs, output, paneName, formatter, pattern, 
  * hard code test server page addresses below so you can test HTML you can't get from your NAS.
 */
 var state;
+
+/// <summary>
+/// In this table are all request to the box handeld, the hole table is waked every refresh
+/// </summary>
 var stateTable =
 [
-	new StateObject("/cgi-bin/management/manaRequest.cgi", "subfunc=netinfo", 	null, 					null, 						formatNetinfo, 	null, false),
-	new StateObject("/cgi-bin/management/manaRequest.cgi", "subfunc=sysinfo", 	null, 					null, 						formatSysinfo, 	null, false),
-    // The following aren't available from 1.06 firmware onwards...
-	//~ new StateObject("/proc/version",	 	"<p style='padding-top:2px; color:Khaki'>Version: {0} </p>", 	"OsData", null, null, true ),
-	//~ new StateObject("/proc/uptime", 	 	"<p style='padding-top:5px'>Up time: {0} </p>",  				"StatusData", formatUptime, null, true ),
-	//~ new StateObject("/proc/net/arp", 	 	"<p style='padding-top:2px'>Client list:<br />{0}</p>",  		"ClientData", 	formatArp, null, true),
-	//new StateObject("/goform/dhcp",		"<p>DHCP: {0}</p>", 	"ServerData", 				checkEnabled, 	'name="f_dhcpsvr_set" value="1"', false ),
-	//new StateObject("/goform/iTunesServ", 	"<p>iTunes: {0}</p>", 	"ServerData", 				checkEnabled,	'name="iTurnServ" checked>Enable', false ),
-	//new StateObject("/goform/adv_upnpav", 	"<p>UPnP: {0}</p>", 	"ServerData", 				checkEnabled, 	'name="f_UPNPAVServ" checked>Enable', false ),
-	//new StateObject("/goform/adv_ftp_setting", "<p>FTP: {0}</p>", 	"ServerData", 				checkEnabled, 	"Started", false ),
-	//new StateObject("/goform/Maint_LLTD", 	"<p>LLTD: {0}</p>", 	"ServerData", 				formatLLTDStatusPage, 'name="f_status" checked>Enable', true ), // Must be done after /goform/adv_status page.
-	//new StateObject("/goform/adv_lan", 	"<p>{0}</p>", 			"NetworkData", 				formatLanSetup,	null, false  ),
-	//new StateObject("/goform/adv_power_management", "<p>{0}</p>", 	"ServerData", 				formatPowerSetup, null, false),
-	//new StateObject("/goform/formLogout", null, null, null, null, false)
+	new StateObject("/cgi-bin/management/manaRequest.cgi", "subfunc=netinfo",  null,  null,  formatNetinfo, null, false),
+	new StateObject("/cgi-bin/management/manaRequest.cgi", "subfunc=sysinfo",  null,  null,  formatSysinfo, null, false),
 ];
 var lastRefreshTime;
 var firmwareVersion;	// Nasty global - set by /goform/adv_status and read by LLTD status.
@@ -68,17 +60,6 @@ var tempGraphHandle;
 var dns323;         	// So far I've only two to worry about (DNS323 or CH3SNAS), so use a flag. Can't tell which it is until you've logged into it.
 var qnapSidNull = "00000000";
 var qnapSid = qnapSidNull;
-
-// Test html output for NAS with two disks.
-var testHTML = '<tr><td class="labelCell2">Volume Name:</td><td><strong>&nbsp;Volume_1<strong></td></tr>\n\
-<tr><td class="labelCell2">Total Hard Drive Capacity:</td><td><strong>&nbsp;313995 MB</strong></td></tr>\n\
-<tr><td class="labelCell2">Used Space:</td><td><strong>&nbsp;59937 MB</strong></td></tr>\n\
-<tr><td class="labelCell2">Unused Space:</td><td><strong>&nbsp;254058 MB</strong></td></tr></table><hr>;\n \
-<table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="505" id="AutoNumber24">\n\
-<tr><td class="labelCell2">Volume Name:</td><td><strong>&nbsp;Volume_2<strong></td></tr>\n\
-<tr><td class="labelCell2">Total Hard Drive Capacity:</td><td><strong>&nbsp;313995 MB</strong></td></tr>\n\
-<tr><td class="labelCell2">Used Space:</td><td><strong>&nbsp;300000 MB</strong></td></tr>\n\
-<tr><td class="labelCell2">Unused Space:</td><td><strong>&nbsp;13995MB</strong></td></tr></table><hr></DIV>       </DIV>';
 
 /* Initialization etc..
  * -------------------------------------------------------------------------------------------------------------------
@@ -92,8 +73,8 @@ function OncePerRunInit()
 	try
 	{
 		// Note: run after html and all that stuff is available.
-		var ident = System.Gadget.name + " version " +System.Gadget.version;
-		debugOut("**OncePerRunInit for " +ident +" System.Gadget.path = " +System.Gadget.path);
+		var ident = System.Gadget.name + " v" + System.Gadget.version;
+		debugOut("**OncePerRunInit for " + ident +" System.Gadget.path = " + System.Gadget.path);
 		document.title = ident;
 
 		GadgetName.innerText = System.Gadget.name;		// needs HTML to be available.
@@ -117,14 +98,29 @@ function OncePerRunInit()
 	}
 }
 
+/// <summary>
+/// Checks if NAS is reachable and inits the login timer.
+/// Called once at startup or by clicking on the gadget title.
+/// </summary>
 function reload()
 {
+	// Remove any active timer
+	try
+	{
+		clearInterval( nasObject.timerHandle );
+	}
+	catch(error)
+	{
+		debugOut("reload: "+error.name+" - "+error.message);
+	}
+
 	// Once per cycle initialization. .. soft reset processing, called on start up and per timer tick.
 	try
 	{
 		debugOut('*reload');
 		GadgetName.innerText = System.Gadget.name;	
 
+		// Reload the settings
 		SettingsManager.loadFile();  			  // Load all settings to memory.
 		if ( SettingsManager.getKeyCount(settingsObj.GroupName) == 0 )
 		{
@@ -135,11 +131,9 @@ function reload()
 		{
 			displayObject.displayMessage (200, "started up");
 
-            // If a CH3NAS then switch image to that.
-            dns323 = SettingsManager.getValue(settingsObj.GroupName, "DNS323" );
-            displayObject.setIcon( dns323 );
-                
-			NasImage.href = 'http://' +SettingsManager.getValue(settingsObj.GroupName, "NASaddress")+":" + SettingsManager.getValue(settingsObj.GroupName, "NASport");
+            displayObject.setIcon( "qnap" );
+			//TODO: What is that? 
+			//NasImage.href = 'http://' +SettingsManager.getValue(settingsObj.GroupName, "NASaddress")+":" + SettingsManager.getValue(settingsObj.GroupName, "NASport");
 			// Get the stats, and then set a timer to do the same thing again every interval.
 			login( getNasStatus );
 			var interval = SettingsManager.getValue( settingsObj.GroupName, "interval" ) * 1000;
@@ -154,20 +148,27 @@ function reload()
 		debugOut("reload: "+error.name+" - "+error.message);
 	}
 }
+
+/// <summary>
+/// Called by System.Gadget.onSettingsClosed when the settings dialog is being closed
 function settingsClosed(p_event)
 {
+	// If save was selected
 	if (p_event.closeAction == p_event.Action.commit)
 	{
-		clearInterval( nasObject.timerHandle );
+		// reload the hole plugin
 		reload();
 	}
 }
 
-/* Restart, shut down and similar NAS commands
+/* 
  * -------------------------------------------------------------------------------------------------------------------
  */
-function commandNas(	flag,			// prompt (default)  or cancel (false)  or do it (true)
-						prompt, 		// Text to prompt with.
+/// <summary>
+/// This function sends commands to the NAS
+/// </summary>
+function commandNas(	flag,		// prompt (default)  or cancel (false)  or do it (true)
+						prompt, 	// Text to prompt with.
 						command )	// Handler for the login response - thing which does the work.
 {
 	try
@@ -176,13 +177,13 @@ function commandNas(	flag,			// prompt (default)  or cancel (false)  or do it (t
 		switch (flag)
 		{
 			case true:	// do it.
-				displayObject.clearMessage();		// remove prompt.
-				if ( command == "doShutdown" )		// Kind of nasty but you can't just pass the "command" as a parameter.
-					doShutdown(0,"");
+				displayObject.clearMessage(); // remove prompt.
+				if ( command == "doShutdown" )
+					doShutdown();
 				else if ( command == "doRestart" )
-					doRestart(0,"");
+					doRestart();
 				else if ( command == "doWakeup" )
-					doWakeup(0,"");
+					doWakeup();
 				break;
 			case false:
 				displayObject.displayMessage( 200, "cancelled");		// Tell them it cancelled ok.
@@ -200,7 +201,10 @@ function commandNas(	flag,			// prompt (default)  or cancel (false)  or do it (t
 	return false;	// Don't refresh the whole page!
 }
 
-function doWakeup( status, text )
+/// <summary>
+/// We use WOL to wake up the device
+/// </summary>
+function doWakeup()
 {
 	debugOut("doWakeup");
 	
@@ -220,20 +224,36 @@ function doWakeup( status, text )
 	{
 		debugOut("doWakeup: "+error.name+" - "+error.message);
 	}
-	//nasObject.makeServerRequest( "/cgi-bin/restart.cgi",  "GET", restartComplete, null ); 	// Tell it to restart!
 }
 
-// From 1.06 onwards you have to log in first, then execute these commands.. so this is the login response handler.
-function doRestart( status, text )
+/// <summary>
+/// Restarting is done be calling restart.cgi script. Only works if preior to this authenitcated
+/// func restartComplete is called after sending the request
+/// </summary>
+function doRestart()
 {
 	debugOut("doRestart");
-	nasObject.makeServerRequest( "/cgi-bin/restart.cgi",  "GET", restartComplete, null ); 	// Tell it to restart!
+	// Old till feb2011
+	//nasObject.makeServerRequest( "/cgi-bin/restart.cgi",  "GET", restartComplete, null ); 	// Tell it to restart!
+	url = "/cgi-bin/sys/sysRequest.cgi" + '?count=' + Math.random() + "&sid=" + encodeURIComponent(qnapSid) + "&subfunc=power_mgmt";
+	action = "&apply=restart";
+	nasObject.makeServerRequest( url + action,  "GET", processStateTable, null );
 }
-function doShutdown( status, text )
+
+/// <summary>
+/// Shuting down is done be calling restart.cgi script. Only works if preior to this authenitcated
+/// func shutDownComplete is called after sending the request
+/// </summary>
+function doShutdown()
 {
 	debugOut("doShutdown");
-	nasObject.makeServerRequest( "/cgi-bin/restart.cgi?option=shutdown",  "GET", shutDownComplete, null ); 	// Tell it to shut down!
+	// Old till feb2011
+	//nasObject.makeServerRequest( "/cgi-bin/restart.cgi?option=shutdown",  "GET", shutDownComplete, null ); 	// Tell it to shut down!
+	url = "/cgi-bin/sys/sysRequest.cgi" + '?count=' + Math.random() + "&sid=" + encodeURIComponent(qnapSid) + "&subfunc=power_mgmt";
+	action = "&apply=shutdown";
+	nasObject.makeServerRequest( url + action,  "GET", processStateTable, null );
 }
+
 function restartComplete( status, text)
 {
 	displayObject.displayMessage( status, "restart" );
@@ -246,14 +266,19 @@ function shutDownComplete( status, text)
 }
 
 
-/* Extraction and processing of data from the NAS web server
+/* 
  * -------------------------------------------------------------------------------------------------------------------
  */
- 
+
+/// <summary>
+/// Here comes the login and authentication stuff
+/// </summary>
 var old_user = "";
 var old_pwd = "";
 var old_ssl = "";
 
+/// <summary>
+/// This is called form a timer all <interval> sec. 
 function login( andThen )	// input is callback method.
 {
 	user = SettingsManager.getValue(settingsObj.GroupName, "account");
@@ -288,16 +313,8 @@ function login( andThen )	// input is callback method.
 
 function loginComplete(text)
 {
-	//try
-	//{
-		qnapSid = extractXMLValue('authSid', text);
-		//debugOut("loginComplete: " + text);
-		debugOut("loginComplete: " + qnapSid);
-	//}
-	//catch(error)
-	//{
-	//	debugOut("loginComplete: "+error.name+" - "+error.message);
-	//}
+	qnapSid = extractXMLValue('authSid', text);
+	debugOut("loginComplete: " + qnapSid);
 }
 
 function getNasStatus( status, text ) // Input is content of previous response (for callbacks) or null for straight calls - it's ignored.
@@ -306,7 +323,7 @@ function getNasStatus( status, text ) // Input is content of previous response (
 	debugOut("getNasStatus: (" + status + ") " + text);
 	displayObject.displayMessage(status, "log on");
 	//displayObject.displayMessage(200, status);	// Login failed, set error code and terminate.
-	if (status == 200)				// Response received ok, but did the login work ok?
+	if (status == 200) // Response received ok, but did the login work ok?
 	{
 		if (text != null) {
 			
@@ -314,16 +331,12 @@ function getNasStatus( status, text ) // Input is content of previous response (
 			if ( text.indexOf("errorValue") == -1 )		// It's the same string for both NAS types.
 			{
 				loginComplete(text);
-	            /* Logged into something... It could be:
-				 * (a) "<TITLE>Conceptronic CH3SNAS</TITLE>"; or
-				 * (b)  a DNS323 in which case the title is the device name set by user, but it's
-				 * 		got "DNS-323" in "<TD width="100%">Product Page:&nbsp;DNS-323</TD>".
-				 * Assume DNS323 by default, look for the string in (a).*/
+	            // Check which device this is. At the moment not active
 	            //if ( text.indexOf("<TITLE>ConceptronicCH3SNAS</TITLE>") != -1 )
 	            //    dns323 = false;
 	            //else
-	                dns323 = true;
-	            displayObject.setIcon( dns323 );
+	            //    dns323 = true;
+	            displayObject.setIcon( "qnap" );
 	            
 	            debugOut("getNasStatus: " + "OK");
 	            
@@ -386,13 +399,6 @@ function processStateTable( status, textResp)
 			endSequence();
 		else
 		{
-			if ( !dns323 )			// Gobble any disabled states.
-			{
-				while ( state !== stateTable.length && stateTable[state].dns323only )	// It's not a 323, and this is a 323 only command, so suppress it.
-					state++;
-				if ( state == stateTable.length )
-					endSequence();
-			}
 			nasObject.makeServerRequest( stateTable[state].nasCommand + '?count=' + Math.random() + "&sid=" + encodeURIComponent(qnapSid) + "&" + stateTable[state].nasArgs,  "GET", processStateTable, null ); 	// More work to do.
 		}
 

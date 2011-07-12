@@ -1,23 +1,25 @@
 <html>
 <head>
-<title>DNS323 Monitor Settings</title>
+<title>QNAPMonitor Settings</title>
 <link rel="stylesheet" href="css/settings.css" type="text/css" />
-<script type="text/javascript" src="settings.js" ></script>
-<script type="text/javascript" src="display.js" ></script>
-<script type="text/javascript" src="utils.js" ></script>
+<script type="text/javascript" src="settings.js"></script>
+<script type="text/javascript" src="display.js"></script>
+<script type="text/javascript" src="utils.js"></script>
 <script type="text/javascript" src="lib/SettingsManager.js"></script>
 </head>
 <body onload="settingsObj.onDisplay()" >
 	<div class="tabcontrol" id="TabContainer">
-		<div class="tab selectedtab" 	onclick="settingsObj.showTab(this, 'comms');" 	style="display:block;">communications</div>
-		<div class="tab"			onclick="settingsObj.showTab(this, 'display');" 	style="display:block;">display</div>
-		<div class="tab"			onclick="settingsObj.showTab(this, 'about');" 	style="display:block;">about</div>
-		<div class="tab" 			onclick="settingsObj.showTab(this, 'links');"  	style="display:block;">links</div>
+		<div class="tab selectedtab" 	onclick="settingsObj.showTab(this, 'comms');"	style="display:block;">communications</div>
+		<div class="tab"				onclick="settingsObj.showTab(this, 'display');"	style="display:block;">display</div>
+		<div class="tab"				onclick="settingsObj.showTab(this, 'about');"	style="display:block;">about</div>
+		<div class="tab" 				onclick="settingsObj.showTab(this, 'links');" 	style="display:block;">links</div>
 	</div>
 	<div id="Tabs">
+		<!-- This tab displays information about how to connect to the device -->
 		<div class="tabcontents" id="comms">
+		
 			<p>Secure Login (SSL):</p>
-			<input type="checkbox" id="NASSecureLogin" value="true" />
+			<input id="NASSecureLogin" type="checkbox" value="true"/>
 			
 			<p>NAS IP Address:</p>
 			<input id="NASaddress" type="text" value="192.168.178.52"/>
@@ -28,23 +30,23 @@
 			<p>NAS SSL Port:</p>
 			<input id="NASportSSL" type="text" value="80"/>
 
-			<p>NAS MAC Address:</p>
-			<input id="NASMACaddress" type="text" value="00:08:9B:BD:29:50"/>
+			<p>NAS MAC Address (for WOL):</p>
+			<input id="NASMACaddress" type="text" value="00:08:9B:BD:29:XX"/>
 
-			<p>Account name:</p>
-			<input id="account" type="text" value="admin" />
+			<p>Username:</p>
+			<input id="account" type="text" value="admin"/>
 
 			<p>Password:</p>
-			<input id="password" type="password" value="qnap" />
-
-			
+			<input id="password" type="password" value="qnap"/>
 
 			<p>Poll interval (sec):</p>
-			<input id="interval" type="text" value="60" />
+			<input id="interval" type="text" value="60"/>
 
 			<p>Timeout (sec):</p>
-			<input id="timeout" type="text" value="5" />
+			<input id="timeout" type="text" value="5"/>
 		</div>
+		
+		<!-- This tab sets how information are to be displayed -->
 		<div class="tabcontents" style="display:none;" id="display" >
 			<p>Show space as <span style="color:orange">orange</span> above:</p>
 			<input id="orangeSpace" type="text" value="80" />&#37;<br />
@@ -61,6 +63,7 @@
 
 		</div>
 
+		<!-- The about tab -->
 		<div class="tabcontents" style="display:none;" id="about" >
 			<p style="text-align:left">A windows gadget for QNAP NAS</p>
 			<p><span id="version"></span>&nbsp;<span id="download"></span></p>
@@ -68,6 +71,7 @@
 			<p>with contributions from Phil Wigglesworth, Iain Kerr, Bob Blackwell and RunaR</p>
 		</div>
 
+		<!-- A tab for links to resources -->
 		<div class="tabcontents" style="display:none;" id="links">
 			<p>Related links</p>
 			<ul>

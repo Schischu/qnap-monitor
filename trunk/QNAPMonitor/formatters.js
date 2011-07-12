@@ -7,36 +7,114 @@
  * add any handlers into here.
  */
 
-
-function parseStatusData()
-{
-	data = "";
-	data += "<p style='padding-top:2px' onmouseover='displayObject.displayToolTip(\"" + 
-		v_internalModelName +"\");' onmouseout='displayObject.clearToolTip();' >" + 
-		v_modelName +"</p>" ;
-	data += "<span style='color:Khaki'>FW: " + v_version + " " + v_build + "</span>";
-	data += "<br /><span style='color:Khaki'>System Temp.: " + v_sys_tempc +"°C</span>";
-	data += "<br /><span style='color:Khaki'>Uptime: " + v_uptime_day +"d " + v_uptime_hour + "h " + v_uptime_min + "m</span>";
-	return data;
-}
-
-//////////////////////////////////////////////
-
+/// <summary>
+/// Strip all whitespace and carriage returns
+/// </summary>
 function replaceWS(text)
 {
-	return text.replace(/\s|\r\n/g,""); // Strip all whitespace and carriage returns
+	return text.replace(/\s|\r\n/g,""); // 
 }
 
 //////////////////////////////////////////////
 
+/// <summary>
+/// Generates the status panel html code
+/// </summary>
+function parseStatusData()
+{
+	html = "";
+	//                  TITLE,          VAR,                                                         FORMAT, PATTERN, STYLE,           TOOLTIP
+	html += buildString("",             v_modelName + " [" + v_platform + "]",                          "text", "", "padding-top:2px", "Internal Model Name: " + v_internalModelName);
+	html += buildString("FW",           v_version + " " + v_build,                                      "text", "", "color:Khaki",     "Firmware");
+	html += buildString("System Temp.", v_sys_tempc + "&#8451;",                                        "text", "", "color:Khaki",     "System Temp in Celsius");
+	html += buildString("Uptime",       v_uptime_day +"d " + v_uptime_hour + "h " + v_uptime_min + "m", "text", "", "color:Khaki",     "Firmware");
+	
+	free_memory_percent = (100 - (parseFloat(v_free_memory) / parseFloat(v_total_memory)) * 100).toFixed(0)
+	html += buildString("Free Space " + free_memory_percent + "%", free_memory_percent, "bar", 100, "green", "Total free space of all disks");
+	
+	return html;
+}
+
+/// <summary>
+/// Generates the network panel html code
+/// </summary>
+function parseNetworkData( sourceText )
+{
+	html = "";
+	//                  TITLE,       VAR,             FORMAT, PATTERN, STYLE,                          TOOLTIP
+	html += buildString("IP",    v_eth0Ipaddress, "text", "",      "",                             "eth0 Ip Address");
+	html += buildString("GW",   v_eth0Gateway,   "text", "",      "",                             "eth0 Gateway");
+	html += buildString("MAC",       v_eth0Hwaddr,    "text", "",      "",                             "eth0 Hw Address");
+	html += buildString("SpeedType", v_eth0Speedtype, "text", "",      "color:Khaki; padding-top:2px", "eth0 Speedtype");
+	html += buildString("Speed",     v_eth0_speed,    "text", "",      "color:Khaki",                  "eth0 Speed");
+	html += buildString("MTU",       v_MTU,           "text", "",      "",                             "MTU");
+
+
+	return html
+}
+
+/// <summary>
+/// Generates the server panel html code
+/// </summary>
+function parseServerData()
+{
+	html = "<div style='overflow-y:auto; height:158px; '; ";
+	//                  TITLE,       VAR,             FORMAT, PATTERN, STYLE
+	html += buildString("MS Server",       v_msServerEnabled,     "bool", "", "");
+	html += buildString("&nbsp;&nbsp;Workgroup",     v_workgroup,           "text", "", "");
+	html += buildString("&nbsp;&nbsp;Type",          v_msServertype,        "text", "", "");
+	html += buildString("WINS",            v_winsEnabled,         "bool", "", "");
+	html += buildString("Domain",          v_domainEnabled,       "text", "", "");
+	html += buildString("AppleTalk",       v_appletalkEnabled,    "bool", "", "");
+	html += buildString("&nbsp;&nbsp;AppleZone",     v_appleZone,           "text", "", "");
+	html += buildString("NFS",             v_nfsEnabled,          "bool", "", "");
+	html += buildString("WebFS",           v_webfsEnabled,        "bool", "", "");
+	html += buildString("FTP",             v_ftpEnabled,          "bool", "", "");
+	html += buildString("&nbsp;&nbsp;Port",          v_ftpPort,             "text", "", "");
+	html += buildString("&nbsp;&nbsp;Max. User",     v_ftpMaxinstances,     "text", "", "");
+	html += buildString("QPhoto",          v_qphotoEnabled,       "bool", "", "");
+	html += buildString("iTunes",          v_itunesEnabled,       "bool", "", "");
+	html += buildString("Upnp",            v_upnpEnabled,         "bool", "", "");
+	html += buildString("Download",        v_downloadEnabled,     "bool", "", "");
+	html += buildString("WebServer",       v_webserverEnabled,    "bool", "", "");
+	html += buildString("&nbsp;&nbsp;Port",          v_webserverPort,       "text", "", "");
+	html += buildString("RegGlobals",      v_regGlobalsEnabled,   "bool", "", "");
+	html += buildString("DDNS",            v_ddnsEnabled,         "bool", "", "");
+	html += buildString("MySql",           v_mysqlEnabled,        "bool", "", "");
+	html += buildString("&nbsp;&nbsp;Networking",    v_mysqlNetworking,     "bool", "", "");
+	html += buildString("Sys Port",        v_sysPort,             "text", "", "");
+	html += buildString("QSurveillance",   v_qsurveillanceEnable, "bool", "", "");
+	html += buildString("Bonjour Service", v_bServiceEnable,      "bool", "", "");
+	html += buildString("&nbsp;&nbsp;Port",          v_servicePort,         "text", "", "");
+	html += "</div>";
+	return html
+}
+
+//////////////////////////////////////////////
+	
+/// <summary>
+/// Formats the sysinfo mana request
+/// </summary>
 function formatSysinfo( text )
 {
 	text = replaceWS(text);
 	
-	v_uptime_day = extractXMLValue2("uptime_day", text);
+	// COMMON ->
+	v_modelName         = extractXMLValue("modelName", text);
+	v_internalModelName = extractXMLValue("internalModelName", text);
+	v_platform          = extractXMLValue("platform", text);
+	v_version           = extractXMLValue("version", text);
+	v_build             = extractXMLValue("build", text);
+	// COMMON <-
+	
+	v_cpu_usage    = extractXMLValue2("cpu_usage", text);
+	v_total_memory = extractXMLValue2("total_memory", text);
+	v_free_memory  = extractXMLValue2("free_memory", text);
+	
+	v_uptime_day  = extractXMLValue2("uptime_day", text);
 	v_uptime_hour = extractXMLValue2("uptime_hour", text);
-	v_uptime_min = extractXMLValue2("uptime_min", text);
-	v_sys_tempc = extractXMLValue2("sys_tempc", text);
+	v_uptime_min  = extractXMLValue2("uptime_min", text);
+	v_sys_tempc   = extractXMLValue2("sys_tempc", text);
 	
 	graphObject.addValue( tempGraphHandle, v_sys_tempc );
 	debugOut("formatSysinfo: " + v_sys_tempc);
@@ -44,237 +122,143 @@ function formatSysinfo( text )
 	StatusData.innerHTML = parseStatusData();
 }
 
+/// <summary>
+/// Formats the netinfo mana request
+/// </summary>
 function formatNetinfo( text )
 {
 	text = replaceWS(text);
 	
-	v_version = extractXMLValue("version", text);
-	v_build = extractXMLValue("build", text);
-	v_modelName = extractXMLValue("modelName", text);
+	// COMMON ->
+	v_modelName         = extractXMLValue("modelName", text);
 	v_internalModelName = extractXMLValue("internalModelName", text);
+	v_platform          = extractXMLValue("platform", text);
+	v_version           = extractXMLValue("version", text);
+	v_build             = extractXMLValue("build", text);
+	// COMMON <-
 	
-	StatusData.innerHTML = parseStatusData();
+	// sub func ownContent lanInfo ->
+	v_msServerEnabled  = extractXMLValue("msServerEnabled", text);
+	v_lanType          = extractXMLValue("lanType", text);
+	v_eth0Speedtype    = extractXMLValue("eth0Speedtype", text);
+	v_eth0Connecttype  = extractXMLValue("eth0Connecttype", text);
+	v_eth0Ipaddress    = extractXMLValue("eth0Ipaddress", text);
+	v_eth0Netmask      = extractXMLValue("eth0Netmask", text);
+	v_eth0Gateway      = extractXMLValue("eth0Gateway", text);
+	v_eth0Hwaddr       = extractXMLValue("eth0Hwaddr", text);
+	v_eth0_speed       = extractXMLValue("eth0_speed", text);
+	v_MTU              = extractXMLValue("MTU", text);
+	v_eth0status       = extractXMLValue("eth0status", text);
+	v_dhcpserverEnable = extractXMLValue("dhcpserverEnable", text);
+	// sub func ownContent lanInfo <-
 	
-	v_eth0Ipaddress = extractXMLValue("eth0Ipaddress", text);
-	v_eth0Gateway = extractXMLValue("eth0Gateway", text);
-	v_eth0Hwaddr = extractXMLValue("eth0Hwaddr", text);
+	// sub func ownContent lnetworkFileservice ->
+	v_msServerEnabled     = extractXMLValue("msServerEnabled", text);
+	v_workgroup           = extractXMLValue("workgroup", text);
+	v_msServertype        = extractXMLValue("msServertype", text);
+	v_winsEnabled         = extractXMLValue("winsEnabled", text);
+	v_domainEnabled       = extractXMLValue("domainEnabled", text);
+	v_appletalkEnabled    = extractXMLValue("appletalkEnabled", text);
+	v_appleZone           = extractXMLValue("appleZone", text);
+	v_nfsEnabled          = extractXMLValue("nfsEnabled", text);
+	v_webfsEnabled        = extractXMLValue("webfsEnabled", text);
+	v_ftpEnabled          = extractXMLValue("ftpEnabled", text);
+	v_ftpPort             = extractXMLValue("ftpPort", text);
+	v_ftpMaxinstances     = extractXMLValue("ftpMaxinstances", text);
+	v_qphotoEnabled       = extractXMLValue("qphotoEnabled", text);
+	v_itunesEnabled       = extractXMLValue("itunesEnabled", text);
+	v_upnpEnabled         = extractXMLValue("upnpEnabled", text);
+	v_downloadEnabled     = extractXMLValue("downloadEnabled", text);
+	v_webserverEnabled    = extractXMLValue("webserverEnabled", text);
+	v_webserverPort       = extractXMLValue("webserverPort", text);
+	v_regGlobalsEnabled   = extractXMLValue("regGlobalsEnabled", text);
+	v_ddnsEnabled         = extractXMLValue("ddnsEnabled", text);
+	v_mysqlEnabled        = extractXMLValue("mysqlEnabled", text);
+	v_mysqlNetworking     = extractXMLValue("mysqlNetworking", text);
+	v_sysPort             = extractXMLValue("sysPort", text);
+	v_qsurveillanceEnable = extractXMLValue("qsurveillanceEnable", text);
+	v_bServiceEnable      = extractXMLValue("bServiceEnable ", text);
+	v_servicePort         = extractXMLValue("servicePort", text);
+	// sub func ownContent lnetworkFileservice <-
+	
+	StatusData.innerHTML  = parseStatusData();
+	NetworkData.innerHTML = parseNetworkData();
+	ServerData.innerHTML  = parseServerData();
+	
 	SettingsManager.setValue( settingsObj.GroupName, "NASMACaddress", v_eth0Hwaddr);
 	SettingsManager.saveFile();
-	v_MTU = extractXMLValue("MTU", text);
-	v_eth0Speedtype = extractXMLValue("eth0Speedtype", text);
-	v_eth0_speed = extractXMLValue("eth0_speed", text);
-	
-	NetworkData.innerHTML = getNetworkStuff( text );
-	ServerData.innerHTML = getServerStuff( text );
+}
 
-	function getNetworkStuff( sourceText )
-	{
-		var fields  = new Array( "eth0Ipaddress", "eth0Gateway", "eth0Hwaddr", "MTU", "eth0Speedtype", "eth0_speed");
-		var titles   = new Array("IP: ", "GW: ", "MAC: ", "MTU: ", "SpeedType: ", "Speed: " );
-		var styles = new Array("", "", "", "", "color:Khaki; padding-top:2px", "color:Khaki" );
-		return buildString  (sourceText, fields, titles, styles );
-	}
-	function getServerStuff( sourceText )
-	{
-		var fields  = new Array(/*"workgroup", "winsEnabled", "domainEnabled", */"appletalkEnabled", /*"appleZone", */
-			"nfsEnabled", "webfsEnabled", "ftpEnabled", /*"ftpPort", "ftpMaxinstances", */"qphotoEnabled", "itunesEnabled",
-			"upnpEnabled", /*"downloadEnabled", "webserverEnabled", "webserverPort", "regGlobalsEnabled", "ddnsEnabled", */
-			"mysqlEnabled", "mysqlNetworking"/*, "sysPort", "qsurveillanceEnable", "bServiceEnable", "servicePort"*/ );
-		
-		//var titles   = new Array("IP: ", "GW: ", "MAC: ", "SpeedType: ", "Speed: ", "MTU: " );
-		return buildString  (sourceText, fields, fields, null );
-	}
-	function buildString( sourceText, fields, titles, styles )
-	{
-		var output = "";	// Place to build output html in.
-		for (var x = 0; x < fields.length; x++) {
-			if (styles != null) {
-				style = styles[x];
-			} else {
-				style = "";
-			}
-			output += "<p style='" +style +"'>" +titles[x]  +extractXMLValue( fields[x], sourceText )  +"</p>";		// Each one a new paragraph.
-		}
-		return output;
-	}
-	function extractPageValue( fieldName, fromThis)
-	{
-		/* Extract and return the value requested from the passed in html data. I'm sure you could do this more efficiently, but it's all a pain...
-		 * This assumes that the form of the web page containing this stuff is as follows (this example is for the "Description" field):
-		 *	<td align="right"><strong>Description:</strong></td>
-		 *	<td><strong>&nbsp;DNS-323 NAS</strong></td>
-		 * or for hard disk data (note missing closing tag on volume name strong, but not other disk data!):
-		 * 	<tr><td class="labelCell2">Volume Name:</td><td><strong>&nbsp;Volume_1<strong></td></tr>
-		 * The "fieldName" as input is used to pick this out.
-		 */
-		try
-		{
-			//var regEx = "(?:" +fieldName +":.*?<strong>&nbsp;)([^<]*)";
-			var regEx = "(?:" + fieldName +"><!\[CDATA\[)([^\]]*)";
-		
-			//regEx.exec(fromThis);
-			fromThis.match(regEx);
-			debugOut("extractPageValue: "+RegExp.$1);
-		}
-		catch(error)
-		{
-			debugOut("extractPageValue: "+error.name+" - "+error.message);
-		}
-		return "123"; //RegExp.$1;		// GLOBAL
-	}
-	function extractTempValue( fromThis )
-	{
-		var temp = extractXMLValue2("sys_tempc", fromThis);
-        
-        //~ debugOut("extractTempValue: " +temp);
-        
-		graphObject.addValue( tempGraphHandle, temp );
-		return drawBar( 	temp,
-							SettingsManager.getValue(settingsObj.GroupName, "tempBarMax"),	// bar max is configurable.
-							getColour( temp, SettingsManager.getValue(settingsObj.GroupName, "orangeTemp"),
-											 SettingsManager.getValue(settingsObj.GroupName, "redTemp") ),
-										"Temperature: " +temp +"&ordm;C", 
-										"max temp is "+ SettingsManager.getValue(settingsObj.GroupName, "tempBarMax") +"&ordm;C" );
-							
-							
-	}
-	function extractDisksUsage(fromThis)
-	{
-		var output = "";
-		try
-		{
-			var regex = /(?:VolumeName:<\/td><td><strong>&nbsp;)([^<]*).*?TotalHardDriveCapacity:[^\d]*(\d*).*?UsedSpace:[^\d]*(\d*)/g;
-			var diskNumber = 0;
-			var match;
-			while((match = regex.exec(fromThis)) !== null)
-			{
-				diskNumber++;
-				//~ debugOut("extractDisksUsage - disk "+diskNumber + " name: " +match[1] +" size: " +match[2] +" used: " +match[3]);
-				var percentage	= (match[3]/match[2])*100;
-				var capacity	= (match[2] /1000).toFixed(0); // Convert MB to GB, dump decimals.
-				var colour = getColour( percentage, 	SettingsManager.getValue(settingsObj.GroupName, "orangeSpace"),
-														SettingsManager.getValue(settingsObj.GroupName, "redSpace") );
-				output += drawBar( 	percentage, 100, colour, 
-									match[1] +" : " +percentage.toFixed(2) +"%",
-									"capacity : " +capacity +"GB" );
-				graphObject.addValue( spaceGraphHandles[diskNumber-1], percentage );		// Write to correct line.
-			}			
-			if ( (spaceGraphHandles.length > 1) && (diskNumber == 1) )	// NOW I know if there's one or two disks in this NAS, so trim any unneeded series.
-				graphObject.removeSeries(spaceGraphHandles.pop() );	// Pop (zap) the handle of the LAST series and pass it to the graph object to delete.
-		}
-		catch(error)
-		{
-		    debugOut("extractDisksUsage: "+error.name+" - "+error.message);
-		}
-		return output;
-	}
-	function getColour( number, orangeValue, redValue )
-	{
-		try
-		{
-			var colour = "green";
-			if ( number >  orangeValue )
-			{
-				colour = "orange";
-				if ( number >  redValue )
-				{
-					colour = "red";
-				}
-				displayObject.showPane( 'StatusData', null);	// And force display to show red or orange!
-			}
-		}
-		catch(error)
-		{
-		    debugOut("getColour: "+error.name+" - "+error.message);
-		}
-		return colour;
-	}
-	function drawBar( value, max, colour, caption, toolTip )	// Draws a bar.
-	{
-		try
-		{
-		 	//~ debugOut("drawBar: ");
-			var barLength = Math.min( (value*displayWidth)/max, displayWidth);	// Never overflow display. displayWidth is the full bar (set in bar style). ** nbsp is for IE height defect.
-			output = "<div class='bar' onmouseover='displayObject.displayToolTip(\"" +toolTip +"\");' onmouseout='displayObject.clearToolTip();' ><div class='bar-inner' style='width:";
-			output += barLength + "px; background-color: " + colour + "'>&nbsp;</div></div><p style='padding-left:2px'>" +caption +"</p>";
-			return  output;
-		}
-		catch(error)
-		{
-		    debugOut("drawBar: "+error.name+" - "+error.message);
-			return "";
-		}
-	}
-}
-function formatLLTDStatusPage( text, pattern  )
+function buildString( title, value, format, pattern, style, tooltip )
 {
-	if (firmwareVersion >= "1.05")
-		return checkEnabled( text, pattern );
-	else
-		return "";
+	if ( format == "text")
+		return buildStringText(title, value, style, tooltip);
+	if ( format == "bool")
+		return buildStringText(title, buildStringBool(value, pattern), style, tooltip);
+	if ( format == "bar")
+		return buildStringBar(title, value, pattern, style, tooltip);
+	return "";
 }
-function formatLanSetup( text, pattern)
-{
-	/*  The LAN speed is formatted as:
-		  <input type="radio" name="speed" value="0" checked>Auto
-		  <input type="radio" name="speed" value="100" >100
-		  <input type="radio" name="speed" value="1000" >1000
-	*/
-	text.match( /name="speed"[^\d]*(\d+)" checked/ );
-	var lanSpeed = RegExp.$1;
-	if (lanSpeed === 0) lanSpeed = "auto";
 
-	return "Lan speed: " +lanSpeed +"<br />Static IP: " +checkEnabled( text, 'checked>Static IP' ) +"<br />Jumbo: " +checkEnabled(text, 'checked>Enable' );
-
-}
-function formatPowerSetup( text)
+function buildStringText( title, value, style, tooltip )
 {
-	// This is a thing with:
-	// [...] name="f_time">
-	// <option value="5" selected>After 5 mins</option> [...etc...]
-	text.match( /f_time(?:.*\n)*.*selected>([^<]*)/ );
-	var timeout = RegExp.$1;
-	return  "<br />Power man: " +checkEnabled(text, 'checked>Enable' ) +"<br />"  +timeout;
+	if (tooltip != "")
+		tooltip =  " onmouseover='displayObject.displayToolTip(\"" + tooltip + "\");' onmouseout='displayObject.clearToolTip();'"
+	if (title != "")
+		title += ": ";
+	return "<p style='" +style + "'" + tooltip + ">" + title + value +"</p>";
 }
-function checkEnabled( text, pattern )
+
+function buildStringBool( value, pattern )
 {
 	// Generic method - call with a pattern, returns enabled/ disabled depending on if found or not.
-	if ( text.match( pattern) )
+	if ( value.match(pattern) )
 		return "<span class='on'>enabled</span>";
 	else
 		return "<span class='off'>disabled</span>";
 }
-//~ function formatArp( text )
-//~ {
-	//~ function getIP( fromThis )
-	//~ {
-		//~ var regEx = /(?:\b(?:\d{1,3}\.){3}\d{1,3}\b)+/g;	// "g" needed to make it match a list.
-		//~ var ipList = new String([fromThis.match(regEx)]);
-		//~ return ipList.replace(",", "<br />" );	// The regex stuff is separated by commas, I think.
-	//~ }
 
-	//~ debugOut("formatArp for " +text );
-	//~ // Input: IP address HW type Flags HW address Mask Device 192.168.1.100 0x1 0x2 00:11:50:06:A7:88 * egiga0
-	//~ // Let's just rip each IP address out of this and send it back as a list of those separated by breaks...
-	//~ return getIP( text );
-//~ }
+function buildStringBar( caption, value, max, colour, toolTip )	// Draws a bar.
+{
+	try
+	{
+		//~ debugOut("drawBar: ");
+		var barLength = Math.min( (value*displayWidth)/max, displayWidth);	// Never overflow display. displayWidth is the full bar (set in bar style). ** nbsp is for IE height defect.
+		output = "<div class='bar' onmouseover='displayObject.displayToolTip(\"" + toolTip +"\");' onmouseout='displayObject.clearToolTip();' ><div class='bar-inner' style='width:";
+		output += barLength + "px; background-color: " + colour + "'>&nbsp;</div></div><p style='padding-left:2px'>" + caption +"</p>";
+		return  output;
+	}
+	catch(error)
+	{
+		debugOut("drawBar: "+error.name+" - "+error.message);
+		return "";
+	}
+}
 
-//~ function formatUptime( text )
-//~ {
-	//~ function parseSeconds( string )                 // Input in seconds, output formatted time string...
-   //~ {
-		   //~ var seconds  = parseInt(string, 10);            // Convert to int
-		   //~ var days = Math.floor(seconds/(24*3600));
-		   //~ seconds = seconds % (24*3600);
-		   //~ var hours   = Math.floor(seconds/3600);
-		   //~ seconds = seconds % 3600;                       // Already counted the hours.
-		   //~ var minutes = Math.floor(seconds/60);
-		   //~ seconds = seconds % 60;         					// The balance of seconds
-		   //~ return days + "d " +hours +":" +minutes +":" +seconds;
-   //~ }
-
-	//~ debugOut("formatUptime = " +text );
-	//~ // Input: 1222090666.76 4508.73  The first number is the current time in fuckwit unix format; the second is the elapsed seconds since boot, I think.
-	//~ var strings = text.split(" ");
-	//~ return parseSeconds( strings[1] );
-//~ }
+function buildDisksUsage(fromThis)
+{
+	var output = "";
+	try
+	{
+		var regex = /(?:VolumeName:<\/td><td><strong>&nbsp;)([^<]*).*?TotalHardDriveCapacity:[^\d]*(\d*).*?UsedSpace:[^\d]*(\d*)/g;
+		var diskNumber = 0;
+		var match;
+		while((match = regex.exec(fromThis)) !== null)
+		{
+			diskNumber++;
+			//~ debugOut("extractDisksUsage - disk "+diskNumber + " name: " +match[1] +" size: " +match[2] +" used: " +match[3]);
+			var percentage	= (match[3]/match[2])*100;
+			var capacity	= (match[2] /1000).toFixed(0); // Convert MB to GB, dump decimals.
+			var colour = getColour( percentage, 	SettingsManager.getValue(settingsObj.GroupName, "orangeSpace"),
+													SettingsManager.getValue(settingsObj.GroupName, "redSpace") );
+			output += drawBar( 	percentage, 100, colour, 
+								match[1] +" : " +percentage.toFixed(2) +"%",
+								"capacity : " +capacity +"GB" );
+		}			
+	}
+	catch(error)
+	{
+		debugOut("extractDisksUsage: "+error.name+" - "+error.message);
+	}
+	return output;
+}
