@@ -16,11 +16,17 @@
 	</div>
 	<div id="Tabs">
 		<div class="tabcontents" id="comms">
+			<p>Secure Login (SSL):</p>
+			<input type="checkbox" id="NASSecureLogin" value="true" />
+			
 			<p>NAS IP Address:</p>
 			<input id="NASaddress" type="text" value="192.168.178.52"/>
 
 			<p>NAS Port:</p>
 			<input id="NASport" type="text" value="8080"/>
+
+			<p>NAS SSL Port:</p>
+			<input id="NASportSSL" type="text" value="80"/>
 
 			<p>NAS MAC Address:</p>
 			<input id="NASMACaddress" type="text" value="00:08:9B:BD:29:50"/>
@@ -30,6 +36,8 @@
 
 			<p>Password:</p>
 			<input id="password" type="password" value="qnap" />
+
+			
 
 			<p>Poll interval (sec):</p>
 			<input id="interval" type="text" value="60" />

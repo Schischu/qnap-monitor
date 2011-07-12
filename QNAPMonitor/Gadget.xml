@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <gadget>
     <name>QNAP Monitor</name>
-    <version>1.1</version>
+    <version>1.2</version>
     <author name="Schischu">
 		<info url="google.de" />
     </author>

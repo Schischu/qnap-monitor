@@ -32,11 +32,29 @@ var nasObject =
 				 if ( command.indexOf("/proc") != -1)
 					command += "?id=" +this.seqNum++;	// Add a once-only number to bypass IE7 cacheing.
 				 
-				var url = "http://" +SettingsManager.getValue( settingsObj.GroupName, "NASaddress" ) + ":" +SettingsManager.getValue( settingsObj.GroupName, "NASport" ) +command;
+				var url = "http://";
+				if (SettingsManager.getValue(settingsObj.GroupName, "NASSecureLogin") == "true")
+					var url = "https://";
+				url = url + SettingsManager.getValue( settingsObj.GroupName, "NASaddress" );
+				
+				if (SettingsManager.getValue(settingsObj.GroupName, "NASSecureLogin") == "true") {
+					port = SettingsManager.getValue( settingsObj.GroupName, "NASportSSL" );
+					if(port != "80")
+						url = url + ":" + port;
+				}
+				else {
+					port = SettingsManager.getValue( settingsObj.GroupName, "NASport" );
+					if(port != "80")
+						url = url + ":" + port;
+				}
+				
+				url = url + command;
 				debugOut("makeServerRequest: " + url);
 				
 				//~ debugOut("makeServerRequest " +url +", type = " +type +" params = " +params );
-				this.httpHandle = new XMLHttpRequest();
+				this.httpHandle = httpreq = new ActiveXObject("Msxml2.ServerXMLHTTP.3.0");
+				this.httpHandle.setOption(2, 13056);
+				//this.httpHandle = new XMLHttpRequest();
 				this.httpHandle.open( type, url, true);		// Parameters: method (GET, POST etc), url, true=asynch.
 				if ( type == "POST")
 				{
