@@ -1,0 +1,45 @@
+<html xmlns:v="urn:schemas-microsoft-com:vml">
+<head>
+<link rel="stylesheet" href="css/styles.css" type="text/css" />
+<script type="text/javascript" src="nasobject.js" ></script>
+<script type="text/javascript" src="formatters.js" ></script>
+<script type="text/javascript" src="display.js" ></script>
+<script type="text/javascript" src="settings.js" ></script>
+<script type="text/javascript" src="utils.js" ></script>
+<script type="text/javascript" src="graph.js" ></script>
+<script type="text/javascript" src="lib/SettingsManager.js"></script>
+<script type="text/javascript" src="default.js" ></script>
+<style>
+v\:* { behavior: url(#default#VML); }
+</style>
+</head>
+<body>
+	<g:background id="backgroundImage" src="url(images/black_back.png)"
+        style="position: absolute;top: 0px; z-index: 0; left:0px; width: 130px; height: 180px;"></g:background>
+	<a href="#" onClick="return true" ><h1 id="GadgetName" onmouseover="displayObject.displayToolTip('reloads gadget');" onmouseout="displayObject.clearToolTip();" >reload</h1></a>
+	<a id="NasImage" onmouseover="displayObject.displayToolTip('click for web page');" onmouseout="displayObject.clearToolTip();" ></a>
+	<div id="BlueFlasher"></div>
+	<div id="Messages"></div>
+	<div id="Panes">
+		<div id="StatusData"  	class="Pane" ></div>
+		<div id="NetworkData" 	class="Pane" ></div>
+		<div id="OsData"   	class="Pane" ></div>
+		<div id="ClientData" 	class="Pane" ></div>
+		<div id="ServerData" 	class="Pane" ></div>
+		<div id="GraphData" 	class="Pane"></div> <!-- Can't put vml in here as it's generated at display time. -->
+	</div>
+	<div id="PaneControls">
+		<a id="default" class="active" onClick="return displayObject.showPane( 'StatusData', this );" onmouseover="displayObject.displayToolTip('status');" onmouseout="displayObject.clearToolTip();" >status</a>
+		<!--<a id="NetTab" onClick="return displayObject.showPane( 'NetworkData', this );" onmouseover="displayObject.displayToolTip('network');" onmouseout="displayObject.clearToolTip();" >net</a>
+		 <a id="OsTab" onClick="return displayObject.showPane( 'OsData', this );" onmouseover="displayObject.displayToolTip('os');" onmouseout="displayObject.clearToolTip();" >os</a>
+		<a id="CliTab" onClick="return displayObject.showPane( 'ClientData', this );" onmouseover="displayObject.displayToolTip('clients');" onmouseout="displayObject.clearToolTip();" >cli</a>-->
+		<a id="SvrTab" onClick="return displayObject.showPane( 'ServerData', this );" onmouseover="displayObject.displayToolTip('enabled servers');" onmouseout="displayObject.clearToolTip();" >servers</a>
+		<a id="GraTab" onClick="return displayObject.showPane( 'GraphData', this );" onmouseover="displayObject.displayToolTip('graph');" onmouseout="displayObject.clearToolTip();" >graph</a>
+	</div>
+	<div id="Buttons">
+		<a id="Refresh" href="#" onClick="return login( getNasStatus );"  onmouseover="displayObject.displayToolTip('refresh stats');"  onmouseout="displayObject.clearToolTip();" ></a>
+		<a id="Restart" href="#" onClick="return commandNas(null, 'restart NAS?', 'doRestart' );" onmouseover="displayObject.displayToolTip('restart NAS');" onmouseout="displayObject.clearToolTip();" ></a>
+		<a id="ShutDown" href="#" onClick="return commandNas(null, 'shut down NAS?', 'doShutdown');" onmouseover="displayObject.displayToolTip('shutdown NAS');" onmouseout="displayObject.clearToolTip();" ></a>
+	</div>
+	<div id="ToolTips"></div>
+</body>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gadget>
+    <name>NAS Monitor</name>
+    <version>1.004</version>
+    <author name="Phil Wigglesworth">
+		<logo src="images/pwlogo.png" />
+		<info url="philwigglesworth.net" />
+    </author>
+    <copyright>&#169;phil wigglesworth 2009</copyright>
+    <description>Monitor and control multiple aspects of the Dlink DNS-323 and the Conceptronic CH3SNAS.</description>
+	<icons>
+		<icon height="50" width="50" src="images/both.png" />
+	</icons>
+    <hosts>
+        <host name="sidebar">
+            <base type="HTML" apiVersion="1.0.0" src="default.html" />
+            <permissions>full</permissions>
+            <platform minPlatformVersion="1.0" />
+        </host>
+    </hosts>
+</gadget>
