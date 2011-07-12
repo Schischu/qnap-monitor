@@ -12,43 +12,48 @@ function formatStatus( text )
 	text = text.replace(/\s|\r\n/g,"");	// Strip all whitespace and carriage returns for the status page - reduce dependence on Taiwan's web expertise.
 
 	// Handles status page response.
-	//~ NetworkData.innerHTML = getNetworkStuff( text );    // No longer possible after 1.06
+	NetworkData.innerHTML = getNetworkStuff( text );    // No longer possible after 1.06
+    ServerData.innerHTML = getServerStuff( text );    // No longer possible after 1.06
     
-    var NasName =  extractPageValue( "Name", text);
-    var Description = extractPageValue( "Description", text );
+    var NasName =  extractXMLValue( "modelName", text);
+    var Description = extractXMLValue( "internalModelName", text );
 	StatusData.innerHTML = "<p style='padding-top:2px' onmouseover='displayObject.displayToolTip(\"" +Description +"\");' onmouseout='displayObject.clearToolTip();' >" +NasName +"</p>" ;    
 	StatusData.innerHTML  += extractDisksUsage (text );
 	//~ StatusData.innerHTML += extractDisksUsage (testHTML.replace(/\s|\r\n/g,"") );		// Uncomment to test two disks..
 
 	// System temperature is a funny field in the web page - returned "hidden" and then displayed via JS.
-	StatusData.innerHTML += extractTempValue( text ) ;
+	//StatusData.innerHTML += extractTempValue( text ) ;
     
-	if ( dns323 )   // Add the firmware version number.
-    	StatusData.innerHTML += "<span style='color:Khaki'>Firmware version: " +extractFirmwareVersion( text ) +"</span>";
+	StatusData.innerHTML += "<span style='color:Khaki'>FW version: " +extractXMLValue( "version", text ) +"</span>";
         
-	function extractFirmwareVersion(fromThis)
-	{
-		/* Thanks to Iain Kerr.
-		 * Returns the Firmware Version, which is available in all forms as well as http://<dns-323>/web/debug.asp
-		 * and http://<dns-323>/web/version.asp.  Parsing from the top of one of the web interface forms requires
-		  * (slightly) less effort though, and that's what this does. */
-		var regEx = "FirmwareVersion\:\&nbsp\;(....)";
-		fromThis.match(regEx);
-		firmwareVersion = RegExp.$1;		// GLOBAL
-		return firmwareVersion;
-	}
 	function getNetworkStuff( sourceText )
-	{	// Don't net DNS2 as I'm short of screen room!
-		var fields  = new Array("IPAddress", "GatewayIPAddress", "DNS1", "MacAddress", "Workgroup", "Name" );
-		var titles   = new Array("IP: ", "GW: ", "DNS1: ",  "MAC: ", "Network: ", "Name: " );
+	{
+		var fields  = new Array("eth0Ipaddress", "eth0Gateway", "eth0Hwaddr", "MTU", "eth0Speedtype", "eth0_speed" );
+		var titles   = new Array("IP: ", "GW: ", "MAC: ", "MTU: ", "SpeedType: ", "Speed: " );
 		var styles = new Array("", "", "", "", "color:Khaki; padding-top:2px", "color:Khaki" );
 		return buildString  (sourceText, fields, titles, styles );
+	}
+	function getServerStuff( sourceText )
+	{
+		var fields  = new Array(/*"workgroup", "winsEnabled", "domainEnabled", */"appletalkEnabled", /*"appleZone", */
+			"nfsEnabled", "webfsEnabled", "ftpEnabled", /*"ftpPort", "ftpMaxinstances", */"qphotoEnabled", "itunesEnabled",
+			"upnpEnabled", /*"downloadEnabled", "webserverEnabled", "webserverPort", "regGlobalsEnabled", "ddnsEnabled", */
+			"mysqlEnabled", "mysqlNetworking"/*, "sysPort", "qsurveillanceEnable", "bServiceEnable", "servicePort"*/ );
+		
+		//var titles   = new Array("IP: ", "GW: ", "MAC: ", "SpeedType: ", "Speed: ", "MTU: " );
+		return buildString  (sourceText, fields, fields, null );
 	}
 	function buildString( sourceText, fields, titles, styles )
 	{
 		var output = "";	// Place to build output html in.
-		for (var x = 0; x < fields.length; x++)
-			output += "<p style='" +styles[x] +"'>" +titles[x]  +extractPageValue( fields[x], sourceText )  +"</p>";		// Each one a new paragraph.
+		for (var x = 0; x < fields.length; x++) {
+			if (styles != null) {
+				style = styles[x];
+			} else {
+				style = "";
+			}
+			output += "<p style='" +style +"'>" +titles[x]  +extractXMLValue( fields[x], sourceText )  +"</p>";		// Each one a new paragraph.
+		}
 		return output;
 	}
 	function extractPageValue( fieldName, fromThis)
@@ -61,9 +66,20 @@ function formatStatus( text )
 		 * 	<tr><td class="labelCell2">Volume Name:</td><td><strong>&nbsp;Volume_1<strong></td></tr>
 		 * The "fieldName" as input is used to pick this out.
 		 */
-		var regEx = "(?:" +fieldName +":.*?<strong>&nbsp;)([^<]*)";
-		fromThis.match(regEx);
-		return RegExp.$1;		// GLOBAL
+		try
+		{
+			//var regEx = "(?:" +fieldName +":.*?<strong>&nbsp;)([^<]*)";
+			var regEx = "(?:" + fieldName +"><!\[CDATA\[)([^\]]*)";
+		
+			//regEx.exec(fromThis);
+			fromThis.match(regEx);
+			debugOut("extractPageValue: "+RegExp.$1);
+		}
+		catch(error)
+		{
+			debugOut("extractPageValue: "+error.name+" - "+error.message);
+		}
+		return "123"; //RegExp.$1;		// GLOBAL
 	}
 	function extractTempValue( fromThis )
 	{

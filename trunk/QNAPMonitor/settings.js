@@ -5,8 +5,8 @@
  */
 /*jsl:import lib/SettingsManager.js*/
 
-var webPageUrl =  "http://philwigglesworth.net/BlogEngine.NET/post/2008/10/06/DNS-323-Windows-Vista-Gadget.aspx";
-var downloadUrl = "http://philwigglesworth.net/downloads/";
+var webPageUrl =  "http://google.de"; //philwigglesworth.net/BlogEngine.NET/post/2008/10/06/DNS-323-Windows-Vista-Gadget.aspx";
+var downloadUrl = "http://google.de"; //philwigglesworth.net/downloads/";
 
 var settingsObj =
 {
@@ -18,7 +18,7 @@ var settingsObj =
 		{
 			/* Pull up the settings and display them in the dialog box. */
 			//~ debugOut("settingsObj.onDisplay " +System.Gadget.version);
-			copyright.innerHTML = "&copy;&nbsp;<a href='" +webPageUrl +"'>phil wigglesworth 2009</a>";
+			copyright.innerHTML = "&copy;&nbsp;<a href='" +webPageUrl +"'>Schischu 2010</a>";
 			version.innerHTML = "Version {0}".replace( "{0}", System.Gadget.version);
 			System.Gadget.onSettingsClosing = settingsObj.settingsClosing;				// Set event handler up for close.
 			settingsObj.loadOrDefaultSettings();

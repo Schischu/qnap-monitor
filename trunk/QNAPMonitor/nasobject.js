@@ -12,6 +12,7 @@
 /*jsl:import lib/SettingsManager.js*/
 /*jsl:import settings.js*/
 
+
 var nasObject =
 {
 	timerHandle: null,		// Handle for the timer which goes off every "interval".
@@ -31,8 +32,9 @@ var nasObject =
 				 if ( command.indexOf("/proc") != -1)
 					command += "?id=" +this.seqNum++;	// Add a once-only number to bypass IE7 cacheing.
 				 
-				var url = "http://" +SettingsManager.getValue( settingsObj.GroupName, "NASaddress" ) +command;
-
+				var url = "http://" +SettingsManager.getValue( settingsObj.GroupName, "NASaddress" ) + ":" +SettingsManager.getValue( settingsObj.GroupName, "NASport" ) +command;
+				debugOut("makeServerRequest: " + url);
+				
 				//~ debugOut("makeServerRequest " +url +", type = " +type +" params = " +params );
 				this.httpHandle = new XMLHttpRequest();
 				this.httpHandle.open( type, url, true);		// Parameters: method (GET, POST etc), url, true=asynch.
@@ -49,7 +51,7 @@ var nasObject =
 				this.httpHandle.send(params);
 				currentThing.timeoutHandle = setTimeout( function() {
 							currentThing.timeoutCallback() ;},
-							SettingsManager.getValue( settingsObj.GroupName, "timeout" ));	// (function, wait time). Note syntax for closure bollocks.
+							SettingsManager.getValue( settingsObj.GroupName, "timeout" ) * 1000);	// (function, wait time). Note syntax for closure bollocks.
 			}
 			catch(error)
 			{
@@ -73,7 +75,7 @@ var nasObject =
 			}
 			catch(error)
 			{
-				debugOut("nasObject.genericCallback: "+error.name+" - "+error.message);
+				//debugOut("nasObject.genericCallback: "+error.name+" - "+error.message);
 			}
 		},
 	timeoutCallback: function ()
