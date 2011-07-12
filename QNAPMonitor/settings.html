@@ -1,0 +1,70 @@
+﻿<html>
+<head>
+<title>DNS323 Monitor Settings</title>
+<link rel="stylesheet" href="css/settings.css" type="text/css" />
+<script type="text/javascript" src="settings.js" ></script>
+<script type="text/javascript" src="display.js" ></script>
+<script type="text/javascript" src="utils.js" ></script>
+<script type="text/javascript" src="lib/SettingsManager.js"></script>
+</head>
+<body onload="settingsObj.onDisplay()" >
+	<div class="tabcontrol" id="TabContainer">
+		<div class="tab selectedtab" 	onclick="settingsObj.showTab(this, 'comms');" 	style="display:block;">communications</div>
+		<div class="tab"			onclick="settingsObj.showTab(this, 'display');" 	style="display:block;">display</div>
+		<div class="tab"			onclick="settingsObj.showTab(this, 'about');" 	style="display:block;">about</div>
+		<div class="tab" 			onclick="settingsObj.showTab(this, 'links');"  	style="display:block;">links</div>
+	</div>
+	<div id="Tabs">
+		<div class="tabcontents" id="comms">
+			<p>NAS IP Address:</p>
+			<input id="NASaddress" type="text" value="192.168.0.32"/>
+
+			<p>Account name:</p>
+			<input id="account" type="text" value="admin" />
+
+			<p>Password:</p>
+			<input id="password" type="password" />
+
+			<p>Poll interval (ms):</p>
+			<input id="interval" type="text" value="600000" />
+
+			<p>Timeout (ms):</p>
+			<input id="timeout" type="text" value="3000" />
+		</div>
+		<div class="tabcontents" style="display:none;" id="display" >
+			<p>Show space as <span style="color:orange">orange</span> above:</p>
+			<input id="orangeSpace" type="text" value="80" />&#37;<br />
+			<p>Show space as <span style="color:red">red</span> above:</p>
+			<input id="redSpace" type="text" value="95" />&#37;<br />
+
+			<p>Show temp as <span style="color:orange">orange</span> above:</p>
+			<input id="orangeTemp" type="text" value="80" />&ordm;C<br />
+			<p >Show temp as <span style="color:red">red</span> above:</p>
+			<input id="redTemp" type="text" value="45"/>&ordm;C<br />
+
+			<p>Maximum temp shown on bar:</p>
+			<input id="tempBarMax"  type="text" value="60" />&ordm;C
+
+		</div>
+
+		<div class="tabcontents" style="display:none;" id="about" >
+			<p style="text-align:left">A windows Vista Gadget for the DNS-323 NAS and CH3SNAS</p>
+			<p><span id="version"></span>&nbsp;<span id="download"></span></p>
+			<p id="copyright"></p>
+			<p>with contributions from Iain Kerr, Bob Blackwell and RunaR</p>
+		</div>
+
+		<div class="tabcontents" style="display:none;" id="links">
+			<p>Related links</p>
+			<ul>
+				<li><a href="http://forum.dsmg600.info/index.php">User forums</li>
+				<li><a href="http://wiki.dns323.info/">User Wiki</a></li>
+				<li><a href="http://www.dlink.co.uk/?go=jN7uAYLx/oIJaWVdDbgYU93ygJVYLelXSNvhLPG3yV3oV415g6ltbNlwaaRp7j8sFz2onGQTo48EE5+3n/K9K0MH8LubPtqzEMT8pnRbyctCCrpHKcCVuErk6TGEOcGXYPgp/FUnrIBfqygTYYTwlmHkhCZRvGisEhtqZg==">D-Link downloads</a></li>
+				<li><a href="http://www.dlink.com/products/?pid=509">D-Link product data</a></li>
+				<li><a href="http://forums.dlink.com/index.php?board=155.0">D-Link forums</a></li>
+				<li><a href="http://philwigglesworth.net/">philwigglesworth.net</a></li>
+			</ul>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,43 @@
+/* For once I don't have to compatibility test against IE6 and IE7. */
+body { margin: 3px 0px 0px 8px; padding: 0px; width: 130px; height: 180px;
+	color: white;
+	text-align: left; font-family: Segoe UI, Verdana, Arial, Helvetica, sans-serif;
+	font-size: 7pt; }
+#GadgetName{position:absolute; top:15px; font-size:8pt; text-align:left; width:100px; margin:0px; padding:0px; cursor:pointer}
+a img {border: none}
+a:link, a:visited {color: white; text-decoration: none; }
+a:hover { color: #ceeaff; text-decoration: underline;}
+
+#NasImage {position:absolute; top:0px; left:90px; width:40px; height:45px; }
+#BlueFlasher{ position:absolute; top:18px; left:103px; width:2px; height:1px; background-color:#0099FF; }
+#ToolTips   {position:absolute; top:27px; width:115px; color:LightSkyBlue}
+#Messages {position:absolute; top:37px; width:130px; color:red}
+
+#Panes {position:absolute; top:52px; height:90px; width:95px; color:white}
+div.Pane {height:117px}
+#PaneControls {position:absolute; top:160px; color:black; text-align:center; background: url('../images/bar.png') repeat-x;}
+#PaneControls a.active   {color:white}
+#PaneControls a.inactive {color:#aaa}
+#PaneControls a {border-right:1px solid black; padding:0px 6px; background: url('../images/bar-inner.png') repeat-x #333; text-decoration:none; color:black; float:left;  cursor:pointer}
+
+
+#Buttons {position:absolute; top:58px; left:103px; padding-left:0px; width:30px}
+#Buttons a {width:24px; height:24px; float:left; margin-bottom:5px}
+#Refresh {background:url(../images/refresh.png)}
+#Refresh:hover {background:url(../images/refresh.png) 0px -24px no-repeat}
+#Restart{background:url(../images/restart.png)}
+#Restart:hover {background:url(../images/restart.png) 0px -24px no-repeat}
+#ShutDown{background:url(../images/shutdown.png)}
+#ShutDown:hover {background:url(../images/shutdown.png) 0px -24px no-repeat}
+
+.good {color:#33CC00}
+.error {color:red}
+.on {color:GreenYellow}
+.off {color:orange}
+.old {color:gray!important}
+.old div p {color:gray!important}
+
+p {margin:0px; padding:0px; line-height:1.2em}
+
+.bar { margin: 7px 4px 0px 0px; padding:0px!important; width:90px; border: 1px solid #333; background: url('../images/bar.png') repeat-x; }
+.bar-inner { margin: 0px; padding: 0px; line-height:0.3em; height: 5px; float: left; background: url('../images/bar-inner.png') repeat-x;}
