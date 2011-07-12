@@ -7,28 +7,69 @@
  * add any handlers into here.
  */
 
-function formatStatus( text )
+
+function parseStatusData()
 {
-	text = text.replace(/\s|\r\n/g,"");	// Strip all whitespace and carriage returns for the status page - reduce dependence on Taiwan's web expertise.
+	data = "";
+	data += "<p style='padding-top:2px' onmouseover='displayObject.displayToolTip(\"" + 
+		v_internalModelName +"\");' onmouseout='displayObject.clearToolTip();' >" + 
+		v_modelName +"</p>" ;
+	data += "<span style='color:Khaki'>FW: " + v_version + " " + v_build + "</span>";
+	data += "<br /><span style='color:Khaki'>System Temp.: " + v_sys_tempc +"°C</span>";
+	data += "<br /><span style='color:Khaki'>Uptime: " + v_uptime_day +"d " + v_uptime_hour + "h " + v_uptime_min + "m</span>";
+	return data;
+}
 
-	// Handles status page response.
-	NetworkData.innerHTML = getNetworkStuff( text );    // No longer possible after 1.06
-    ServerData.innerHTML = getServerStuff( text );    // No longer possible after 1.06
-    
-    var NasName =  extractXMLValue( "modelName", text);
-    var Description = extractXMLValue( "internalModelName", text );
-	StatusData.innerHTML = "<p style='padding-top:2px' onmouseover='displayObject.displayToolTip(\"" +Description +"\");' onmouseout='displayObject.clearToolTip();' >" +NasName +"</p>" ;    
-	StatusData.innerHTML  += extractDisksUsage (text );
-	//~ StatusData.innerHTML += extractDisksUsage (testHTML.replace(/\s|\r\n/g,"") );		// Uncomment to test two disks..
+//////////////////////////////////////////////
 
-	// System temperature is a funny field in the web page - returned "hidden" and then displayed via JS.
-	//StatusData.innerHTML += extractTempValue( text ) ;
-    
-	StatusData.innerHTML += "<span style='color:Khaki'>FW version: " +extractXMLValue( "version", text ) +"</span>";
-        
+function replaceWS(text)
+{
+	return text.replace(/\s|\r\n/g,""); // Strip all whitespace and carriage returns
+}
+
+//////////////////////////////////////////////
+
+function formatSysinfo( text )
+{
+	text = replaceWS(text);
+	
+	v_uptime_day = extractXMLValue2("uptime_day", text);
+	v_uptime_hour = extractXMLValue2("uptime_hour", text);
+	v_uptime_min = extractXMLValue2("uptime_min", text);
+	v_sys_tempc = extractXMLValue2("sys_tempc", text);
+	
+	graphObject.addValue( tempGraphHandle, v_sys_tempc );
+	debugOut("formatSysinfo: " + v_sys_tempc);
+
+	StatusData.innerHTML = parseStatusData();
+}
+
+function formatNetinfo( text )
+{
+	text = replaceWS(text);
+	
+	v_version = extractXMLValue("version", text);
+	v_build = extractXMLValue("build", text);
+	v_modelName = extractXMLValue("modelName", text);
+	v_internalModelName = extractXMLValue("internalModelName", text);
+	
+	StatusData.innerHTML = parseStatusData();
+	
+	v_eth0Ipaddress = extractXMLValue("eth0Ipaddress", text);
+	v_eth0Gateway = extractXMLValue("eth0Gateway", text);
+	v_eth0Hwaddr = extractXMLValue("eth0Hwaddr", text);
+	SettingsManager.setValue( settingsObj.GroupName, "NASMACaddress", v_eth0Hwaddr);
+	SettingsManager.saveFile();
+	v_MTU = extractXMLValue("MTU", text);
+	v_eth0Speedtype = extractXMLValue("eth0Speedtype", text);
+	v_eth0_speed = extractXMLValue("eth0_speed", text);
+	
+	NetworkData.innerHTML = getNetworkStuff( text );
+	ServerData.innerHTML = getServerStuff( text );
+
 	function getNetworkStuff( sourceText )
 	{
-		var fields  = new Array("eth0Ipaddress", "eth0Gateway", "eth0Hwaddr", "MTU", "eth0Speedtype", "eth0_speed" );
+		var fields  = new Array( "eth0Ipaddress", "eth0Gateway", "eth0Hwaddr", "MTU", "eth0Speedtype", "eth0_speed");
 		var titles   = new Array("IP: ", "GW: ", "MAC: ", "MTU: ", "SpeedType: ", "Speed: " );
 		var styles = new Array("", "", "", "", "color:Khaki; padding-top:2px", "color:Khaki" );
 		return buildString  (sourceText, fields, titles, styles );
@@ -83,10 +124,7 @@ function formatStatus( text )
 	}
 	function extractTempValue( fromThis )
 	{
-        var regEx = /vartemper="(?:\d*):(\d\d)/;  // 1.06 (take from jscript bit). 1.05 was from body: /(?:HDTemperature.*\/(\d\d))/
-
-		fromThis.match(regEx);
-		var temp = RegExp.$1;
+		var temp = extractXMLValue2("sys_tempc", fromThis);
         
         //~ debugOut("extractTempValue: " +temp);
         

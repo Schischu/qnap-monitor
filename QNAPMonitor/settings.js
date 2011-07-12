@@ -18,7 +18,7 @@ var settingsObj =
 		{
 			/* Pull up the settings and display them in the dialog box. */
 			//~ debugOut("settingsObj.onDisplay " +System.Gadget.version);
-			copyright.innerHTML = "&copy;&nbsp;<a href='" +webPageUrl +"'>Schischu 2010</a>";
+			copyright.innerHTML = "&copy;&nbsp;<a href='" +webPageUrl +"'>phil wigglesworth(2009) and Schischu(2010)</a>";
 			version.innerHTML = "Version {0}".replace( "{0}", System.Gadget.version);
 			System.Gadget.onSettingsClosing = settingsObj.settingsClosing;				// Set event handler up for close.
 			settingsObj.loadOrDefaultSettings();
