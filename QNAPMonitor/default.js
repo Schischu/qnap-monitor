@@ -24,9 +24,10 @@
 /* Data etc..
  * -------------------------------------------------------------------------------------------------------------------
  */
-function StateObject(nasCommand, output, paneName, formatter, pattern, dns323only)
+function StateObject(nasCommand, nasArgs, output, paneName, formatter, pattern, dns323only)
 {
 	this.nasCommand = nasCommand;	// Thing to send to the NAS
+	this.nasArgs = nasArgs;	// Thing to send to the NAS
 	this.output = output;			// Format string for output.
 	this.paneName = paneName;		// Name of the pane to display this on.
 	this.formatter = formatter;	// Format routine if special formatting required.
@@ -44,19 +45,19 @@ function StateObject(nasCommand, output, paneName, formatter, pattern, dns323onl
 var state;
 var stateTable =
 [
-	new StateObject("/goform/adv_status", 	null, 					null, 						formatStatus, 	null, false),
+	new StateObject("/cgi-bin/management/manaRequest.cgi", "subfunc=netinfo", 	null, 					null, 						formatStatus, 	null, false),
     // The following aren't available from 1.06 firmware onwards...
 	//~ new StateObject("/proc/version",	 	"<p style='padding-top:2px; color:Khaki'>Version: {0} </p>", 	"OsData", null, null, true ),
 	//~ new StateObject("/proc/uptime", 	 	"<p style='padding-top:5px'>Up time: {0} </p>",  				"StatusData", formatUptime, null, true ),
 	//~ new StateObject("/proc/net/arp", 	 	"<p style='padding-top:2px'>Client list:<br />{0}</p>",  		"ClientData", 	formatArp, null, true),
-	new StateObject("/goform/dhcp",		"<p>DHCP: {0}</p>", 	"ServerData", 				checkEnabled, 	'name="f_dhcpsvr_set" value="1"', false ),
-	new StateObject("/goform/iTunesServ", 	"<p>iTunes: {0}</p>", 	"ServerData", 				checkEnabled,	'name="iTurnServ" checked>Enable', false ),
-	new StateObject("/goform/adv_upnpav", 	"<p>UPnP: {0}</p>", 	"ServerData", 				checkEnabled, 	'name="f_UPNPAVServ" checked>Enable', false ),
-	new StateObject("/goform/adv_ftp_setting", "<p>FTP: {0}</p>", 	"ServerData", 				checkEnabled, 	"Started", false ),
-	new StateObject("/goform/Maint_LLTD", 	"<p>LLTD: {0}</p>", 	"ServerData", 				formatLLTDStatusPage, 'name="f_status" checked>Enable', true ), // Must be done after /goform/adv_status page.
-	new StateObject("/goform/adv_lan", 	"<p>{0}</p>", 			"NetworkData", 				formatLanSetup,	null, false  ),
-	new StateObject("/goform/adv_power_management", "<p>{0}</p>", 	"ServerData", 				formatPowerSetup, null, false),
-	new StateObject("/goform/formLogout", null, null, null, null, false)
+	//new StateObject("/goform/dhcp",		"<p>DHCP: {0}</p>", 	"ServerData", 				checkEnabled, 	'name="f_dhcpsvr_set" value="1"', false ),
+	//new StateObject("/goform/iTunesServ", 	"<p>iTunes: {0}</p>", 	"ServerData", 				checkEnabled,	'name="iTurnServ" checked>Enable', false ),
+	//new StateObject("/goform/adv_upnpav", 	"<p>UPnP: {0}</p>", 	"ServerData", 				checkEnabled, 	'name="f_UPNPAVServ" checked>Enable', false ),
+	//new StateObject("/goform/adv_ftp_setting", "<p>FTP: {0}</p>", 	"ServerData", 				checkEnabled, 	"Started", false ),
+	//new StateObject("/goform/Maint_LLTD", 	"<p>LLTD: {0}</p>", 	"ServerData", 				formatLLTDStatusPage, 'name="f_status" checked>Enable', true ), // Must be done after /goform/adv_status page.
+	//new StateObject("/goform/adv_lan", 	"<p>{0}</p>", 			"NetworkData", 				formatLanSetup,	null, false  ),
+	//new StateObject("/goform/adv_power_management", "<p>{0}</p>", 	"ServerData", 				formatPowerSetup, null, false),
+	//new StateObject("/goform/formLogout", null, null, null, null, false)
 ];
 var lastRefreshTime;
 var firmwareVersion;	// Nasty global - set by /goform/adv_status and read by LLTD status.
@@ -64,6 +65,8 @@ var displayWidth = 90;	// Constant for the width of the display of graphic items
 var spaceGraphHandles;	// Multiple possible as multiple disks may be found.
 var tempGraphHandle;
 var dns323;         	// So far I've only two to worry about (DNS323 or CH3SNAS), so use a flag. Can't tell which it is until you've logged into it.
+var qnapSidNull = "00000000";
+var qnapSid = qnapSidNull;
 
 // Test html output for NAS with two disks.
 var testHTML = '<tr><td class="labelCell2">Volume Name:</td><td><strong>&nbsp;Volume_1<strong></td></tr>\n\
@@ -135,11 +138,10 @@ function reload()
             dns323 = SettingsManager.getValue(settingsObj.GroupName, "DNS323" );
             displayObject.setIcon( dns323 );
                 
-			NasImage.href = 'http://' +SettingsManager.getValue(settingsObj.GroupName, "NASaddress");
-			
+			NasImage.href = 'http://' +SettingsManager.getValue(settingsObj.GroupName, "NASaddress")+":" + SettingsManager.getValue(settingsObj.GroupName, "NASport");
 			// Get the stats, and then set a timer to do the same thing again every interval.
 			login( getNasStatus );
-			var interval = SettingsManager.getValue( settingsObj.GroupName, "interval" );
+			var interval = SettingsManager.getValue( settingsObj.GroupName, "interval" ) * 1000;
 			if ( interval > 0 )	// Zero => don't poll.
 				nasObject.timerHandle = setInterval ( "login( getNasStatus )", interval );
 		}
@@ -175,9 +177,9 @@ function commandNas(	flag,			// prompt (default)  or cancel (false)  or do it (t
 			case true:	// do it.
 				displayObject.clearMessage();		// remove prompt.
 				if ( command == "doShutdown" )		// Kind of nasty but you can't just pass the "command" as a parameter.
-					login ( doShutdown );
+					doShutdown(0,"");
 				else
-					login ( doRestart);
+					doRestart(0,"");
 				break;
 			case false:
 				displayObject.displayMessage( 200, "cancelled");		// Tell them it cancelled ok.
@@ -198,12 +200,12 @@ function commandNas(	flag,			// prompt (default)  or cancel (false)  or do it (t
 function doRestart( status, text )
 {
 	debugOut("doRestart");
-	nasObject.makeServerRequest( "/goform/System_restart",  "GET", restartComplete, null ); 	// Tell it to restart!
+	nasObject.makeServerRequest( "/cgi-bin/restart.cgi",  "GET", restartComplete, null ); 	// Tell it to restart!
 }
 function doShutdown( status, text )
 {
 	debugOut("doShutdown");
-	nasObject.makeServerRequest( "/goform/sysShutDown",  "GET", shutDownComplete, null ); 	// Tell it to shut down!
+	nasObject.makeServerRequest( "/cgi-bin/restart.cgi?option=shutdown",  "GET", shutDownComplete, null ); 	// Tell it to shut down!
 }
 function restartComplete( status, text)
 {
@@ -222,40 +224,78 @@ function shutDownComplete( status, text)
  */
 function login( andThen )	// input is callback method.
 {
-	//~ debugOut("login, and then: " +andThen);
-	nasObject.makeServerRequest( "/goform/formLogin",   "POST", andThen,
-								 'f_LOGIN_NAME=' +SettingsManager.getValue(settingsObj.GroupName, "account") +'&f_LOGIN_PASSWD=' + SettingsManager.getValue(settingsObj.GroupName, "password") +'&f_login_type=0' );
+	if (qnapSid != qnapSidNull)
+	{
+		andThen(200, null)
+		return true;
+	}
+	user = SettingsManager.getValue(settingsObj.GroupName, "account");
+	user = encodeURIComponent(user);
+	pwd = SettingsManager.getValue(settingsObj.GroupName, "password");
+	pwd = encodeURIComponent(ezEncode(utf16to8(pwd)));
+	url = '/cgi-bin/authLogin.cgi?count=' + Math.random() + '&user=' + user + '&pwd=' + pwd + '&admin=1'
+	
+	nasObject.makeServerRequest( url,  "GET", andThen, null );
+	
 	return false;	// Don't refresh the whole page!
 }
+
+function loginComplete(text)
+{
+	//try
+	//{
+		qnapSid = extractXMLValue('authSid', text);
+		//debugOut("loginComplete: " + text);
+		debugOut("loginComplete: " + qnapSid);
+	//}
+	//catch(error)
+	//{
+	//	debugOut("loginComplete: "+error.name+" - "+error.message);
+	//}
+}
+
 function getNasStatus( status, text ) // Input is content of previous response (for callbacks) or null for straight calls - it's ignored.
 {
+	//debugOut("getNasStatus: " + status);
+	debugOut("getNasStatus: " + text);
 	displayObject.displayMessage(status, "log on");
+	//displayObject.displayMessage(200, status);	// Login failed, set error code and terminate.
 	if (status == 200)				// Response received ok, but did the login work ok?
 	{
-		text = text.replace(/\s|\r\n/g,"");	// Strip all whitespace and carriage returns.
-		if ( text.indexOf("Youenteredanincorrectloginnameorpassword.") == -1 )		// It's the same string for both NAS types.
-		{
-            /* Logged into something... It could be:
-			 * (a) "<TITLE>Conceptronic CH3SNAS</TITLE>"; or
-			 * (b)  a DNS323 in which case the title is the device name set by user, but it's
-			 * 		got "DNS-323" in "<TD width="100%">Product Page:&nbsp;DNS-323</TD>".
-			 * Assume DNS323 by default, look for the string in (a).*/
-            if ( text.indexOf("<TITLE>ConceptronicCH3SNAS</TITLE>") != -1 )
-                dns323 = false;
-            else
-                dns323 = true;
-            displayObject.setIcon( dns323 );
-            
-			processStateTable(null, null);		// Login ok, so go and do all the real work.
+		if (text != null) {
+			loginComplete(text);
+			text = text.replace(/\s|\r\n/g,"");	// Strip all whitespace and carriage returns.
+			if ( text.indexOf("errorValue") == -1 )		// It's the same string for both NAS types.
+			{
+	            /* Logged into something... It could be:
+				 * (a) "<TITLE>Conceptronic CH3SNAS</TITLE>"; or
+				 * (b)  a DNS323 in which case the title is the device name set by user, but it's
+				 * 		got "DNS-323" in "<TD width="100%">Product Page:&nbsp;DNS-323</TD>".
+				 * Assume DNS323 by default, look for the string in (a).*/
+	            //if ( text.indexOf("<TITLE>ConceptronicCH3SNAS</TITLE>") != -1 )
+	            //    dns323 = false;
+	            //else
+	                dns323 = true;
+	            displayObject.setIcon( dns323 );
+	            
+	            debugOut("getNasStatus: " + "OK");
+	            
+				processStateTable(null, null);		// Login ok, so go and do all the real work.
+			}
 		}
 		else
 		{
-			displayObject.displayMessage(-1, "log on");	// Login failed, set error code and terminate.
-			BlueFlasher.style.display ="none";
-			// STOPS HERE here if login fails.
+			processStateTable(null, null);		// Login ok, so go and do all the real work.
 		}
 	}
+	else
+	{
+		displayObject.displayMessage(-1, "log on");	// Login failed, set error code and terminate.
+		BlueFlasher.style.display ="none";
+		// STOPS HERE here if login fails.
+	}
 }
+
 function processStateTable( status, textResp)
 {
 	/* I'm getting devious here, which is probably a bad idea. This is the callback for a chain of commands and their processing, as defined
@@ -303,7 +343,7 @@ function processStateTable( status, textResp)
 				if ( state == stateTable.length )
 					endSequence();
 			}
-			nasObject.makeServerRequest( stateTable[state].nasCommand,  "GET", processStateTable, null ); 	// More work to do.
+			nasObject.makeServerRequest( stateTable[state].nasCommand + '?count=' + Math.random() + "&sid=" + encodeURIComponent(qnapSid) + "&" + stateTable[state].nasArgs,  "GET", processStateTable, null ); 	// More work to do.
 		}
 
 		function endSequence()

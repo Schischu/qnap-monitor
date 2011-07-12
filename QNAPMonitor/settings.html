@@ -1,4 +1,4 @@
-﻿<html>
+<html>
 <head>
 <title>DNS323 Monitor Settings</title>
 <link rel="stylesheet" href="css/settings.css" type="text/css" />
@@ -17,19 +17,22 @@
 	<div id="Tabs">
 		<div class="tabcontents" id="comms">
 			<p>NAS IP Address:</p>
-			<input id="NASaddress" type="text" value="192.168.0.32"/>
+			<input id="NASaddress" type="text" value="192.168.178.52"/>
+
+			<p>NAS Port:</p>
+			<input id="NASport" type="text" value="8080"/>
 
 			<p>Account name:</p>
 			<input id="account" type="text" value="admin" />
 
 			<p>Password:</p>
-			<input id="password" type="password" />
+			<input id="password" type="password" value="qnap" />
 
-			<p>Poll interval (ms):</p>
-			<input id="interval" type="text" value="600000" />
+			<p>Poll interval (sec):</p>
+			<input id="interval" type="text" value="600" />
 
-			<p>Timeout (ms):</p>
-			<input id="timeout" type="text" value="3000" />
+			<p>Timeout (sec):</p>
+			<input id="timeout" type="text" value="3" />
 		</div>
 		<div class="tabcontents" style="display:none;" id="display" >
 			<p>Show space as <span style="color:orange">orange</span> above:</p>
@@ -48,15 +51,18 @@
 		</div>
 
 		<div class="tabcontents" style="display:none;" id="about" >
-			<p style="text-align:left">A windows Vista Gadget for the DNS-323 NAS and CH3SNAS</p>
+			<p style="text-align:left">A windows gadget for QNAP NAS</p>
 			<p><span id="version"></span>&nbsp;<span id="download"></span></p>
 			<p id="copyright"></p>
-			<p>with contributions from Iain Kerr, Bob Blackwell and RunaR</p>
+			<p>with contributions from Phil Wigglesworth, Iain Kerr, Bob Blackwell and RunaR</p>
 		</div>
 
 		<div class="tabcontents" style="display:none;" id="links">
 			<p>Related links</p>
 			<ul>
+				<li><b>QNAP:</b></li>
+				<li><a href="http://forum.qnapclub.de/">User forums</a></li>
+				<li><b>DLINK:</b></li>
 				<li><a href="http://forum.dsmg600.info/index.php">User forums</li>
 				<li><a href="http://wiki.dns323.info/">User Wiki</a></li>
 				<li><a href="http://www.dlink.co.uk/?go=jN7uAYLx/oIJaWVdDbgYU93ygJVYLelXSNvhLPG3yV3oV415g6ltbNlwaaRp7j8sFz2onGQTo48EE5+3n/K9K0MH8LubPtqzEMT8pnRbyctCCrpHKcCVuErk6TGEOcGXYPgp/FUnrIBfqygTYYTwlmHkhCZRvGisEhtqZg==">D-Link downloads</a></li>

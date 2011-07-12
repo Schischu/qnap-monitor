@@ -27,5 +27,26 @@ function getElementsByClassName(oElm, strTagName, strClassName)
 
 function debugOut(msg)
 {
-	//~ System.Debug.outputString(msg);	// View with DebugView from MS.
+	System.Debug.outputString(msg);	// View with DebugView from MS.
 }
+
+
+function extractXMLValue( fieldName, fromThis)
+	{
+		//debugOut("extractPageValue: "+fromThis);
+		text = fromThis.replace(/\s|\r\n/g,"");	// Strip all whitespace and carriage returns.
+		debugOut("extractPageValue: "+text);
+		try
+		{
+			//var regEx = "(?:" +fieldName +":.*?<strong>&nbsp;)([^<]*)";
+			var regEx = '(?:' + fieldName +'><!\\[CDATA\\[)([^\\]]*)';
+		
+			text.match(regEx);
+			debugOut("extractPageValue: "+RegExp.$1);
+		}
+		catch(error)
+		{
+			debugOut("extractPageValue: "+error.name+" - "+error.message);
+		}
+		return RegExp.$1;		// GLOBAL
+	}
