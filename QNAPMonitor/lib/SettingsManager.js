@@ -7,6 +7,8 @@
 	You may use this code freely and without Author's permission, but copies and derivitive code must retain this unaltered comment banner at the top.
 ------------------------------------------------------*/
 
+var useGlobalSettingsFile = false;
+
 /* Hacked by phil to do what I really want, which is less than the original, but I 
  * need it to put the file outside the gadget, so it persists across gadget updates.
  */
@@ -28,9 +30,16 @@ var SettingsManager =
         {
             /* Settings are stored one directory higher than the gadnet, so it's there across install/ uninstall, and also I don't 
 			 * accidentally package my own details up for other people!  */
-            var fullPath;
-            System.Gadget.path.match( /(.*\\).*$/ );	// So RegExp.$1 has the path bit I need in it.	
-            fullPath = RegExp.$1 +this.FileName;
+			
+			// Schischu: Actually this will not allow us to use multiple instance of a gadget anymore.
+			// So I would suggest for the timebeing that multiple instances is more important than the above meantioned
+			if ( useGlobalSettingsFile == true ) {
+				var fullPath;
+				System.Gadget.path.match( /(.*\\).*$/ );	// So RegExp.$1 has the path bit I need in it.	
+				fullPath = RegExp.$1 + this.FileName;
+			}
+			else
+				fullPath = System.Gadget.path + "/" + this.FileName;
         }
         catch(error)
         {

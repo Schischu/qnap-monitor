@@ -37,7 +37,6 @@ function extractXMLValue( fieldName, fromThis)
 	{
 		text = fromThis.replace(/\s|\r\n/g,"");	// Strip all whitespace and carriage returns.
 		debugOut("extractPageValue: "+text);
-		//var regEx = "(?:" +fieldName +":.*?<strong>&nbsp;)([^<]*)";
 		var regEx = '(?:' + fieldName +'><!\\[CDATA\\[)([^\\]]*)';
 	
 		text.match(regEx);

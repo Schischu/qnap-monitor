@@ -10,7 +10,7 @@ var displayObject =
 {
 	timerHandle: null,
 
-	displayToolTip : function ( text ) { ToolTips.innerHTML = "<p>"+text +"</p>"; },
+	displayToolTip : function ( text ) { ToolTips.innerHTML = "<p>"+ text +"</p>"; },
 	clearToolTip: function() { ToolTips.innerHTML = ""; },
 
 	displayMessage : function ( status, text, persistent )
@@ -21,7 +21,7 @@ var displayObject =
 		var currentThing = this;				// Closure frig.
 		clearTimeout( currentThing.timerHandle );	// In case there's a pending timer..
 
-		if ( status == 200)
+		if ( status == 200 )
 		{
 			Panes.className = "";	// No graying out if it worked.
 			if (!persistent)
@@ -97,22 +97,20 @@ var displayObject =
 		}
 		catch(error)
 		{
-			debugOut("extractDisksUsage: "+error.name+" - "+error.message);
+			debugOut("extractDisksUsage: " + error.name + " - " + error.message);
 		}
 		return false; // don't reload if called from html.
 	},
     
-    setIcon: function ( dns323 )
+    setIcon: function ( device )
     {
-        // By default, show the DNS323 icon. If this is called, switch to the CH3NAS icon.
-        //~ debugOut("setIcon, dns323 = " +dns323 +".");
-        SettingsManager.setValue(settingsObj.GroupName, "DNS323", dns323);  // Remember NAS type.
+        SettingsManager.setValue(settingsObj.GroupName, "NASDevice", device);  // Remember NAS type.
         SettingsManager.saveFile();   
         
-        if (dns323 == "false")  // Laborious as it may be null.
-        {
-            backgroundImage.src = 'images/CH3SNAS_back.png';	// Display correct logo.
-            BlueFlasher.style.left = "99px";
-        }
+        //if (dns323 == "false")  // Laborious as it may be null.
+        //{
+        //    backgroundImage.src = 'images/CH3SNAS_back.png';	// Display correct logo.
+        //    BlueFlasher.style.left = "99px";
+        //}
     }
 };
