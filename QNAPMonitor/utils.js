@@ -67,3 +67,35 @@ function extractXMLValue2( fieldName, fromThis)
 	}
 	return RegExp.$1;		// GLOBAL
 }
+
+function extractXMLValues2( fieldName, fromThis)
+{
+	ret = []
+	try
+	{
+		text = fromThis.replace(/\s|\r\n/g,"");	// Strip all whitespace and carriage returns.
+		debugOut("extractXMLValues2: "+text);
+		//var regEx = "(?:" +fieldName +":.*?<strong>&nbsp;)([^<]*)";
+		var star = '<' + fieldName +'>';
+		var end = '</' + fieldName +'>';
+		var regEx = '(<' + fieldName +'>)([^<]*)';
+		var regEx2 = '(?:<' + fieldName +'>)([^<]*)';
+		//regEx = new RegExp(regEx,"g");
+		debugOut("extractXMLValues2: regEx="+regEx);
+		var index = text.search(regEx2);
+		while (index >= 0) {
+			text.match(regEx2);
+			debugOut("extractXMLValues2: "+RegExp.$1);
+			ret.push(RegExp.$1)
+			text = text.substring(index + RegExp.$1.length + star.length + end.length);
+			debugOut("extractXMLValues2: "+text);
+			index = text.search(regEx2);
+			debugOut("extractXMLValues2: index "+index);
+		}
+	}
+	catch(error)
+	{
+		debugOut("extractPageValue: "+error.name+" - "+error.message);
+	}
+	return ret;		// GLOBAL
+}

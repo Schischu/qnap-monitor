@@ -27,10 +27,18 @@ function parseStatusData()
 	html += buildString("",             v_modelName + " [" + v_platform + "]",                          "text", "", "padding-top:2px", "Internal Model Name: " + v_internalModelName);
 	html += buildString("FW",           v_version + " " + v_build,                                      "text", "", "color:Khaki",     "Firmware");
 	html += buildString("System Temp.", v_sys_tempc + "&#8451;",                                        "text", "", "color:Khaki",     "System Temp in Celsius");
-	html += buildString("Uptime",       v_uptime_day +"d " + v_uptime_hour + "h " + v_uptime_min + "m", "text", "", "color:Khaki",     "Firmware");
+	html += buildString("Uptime",       v_uptime_day +"d " + v_uptime_hour + "h " + v_uptime_min + "m", "text", "", "color:Khaki",     "Uptim");
 	
-	free_memory_percent = (100 - (parseFloat(v_free_memory) / parseFloat(v_total_memory)) * 100).toFixed(0)
-	html += buildString("Free Space " + free_memory_percent + "%", free_memory_percent, "bar", 100, "green", "Total free space of all disks");
+	//free_memory_percent = (100 - (parseFloat(v_free_memory) / parseFloat(v_total_memory)) * 100).toFixed(0)
+	used_memory_percent = (100- (parseFloat(v_free_memory) / parseFloat(v_total_memory)) * 100).toFixed(0)
+	html += buildString("Mem Usage " + used_memory_percent + "%", used_memory_percent, "bar", 100, "green", "Total " + v_total_memory + " MB<br />" + "Free " + v_free_memory + " MB");
+	
+	for (var i = 0; i < v_volumeCount; i++) {
+		total = v_volumeArray[i][1];
+		free  = v_volumeArray[i][2];
+		used_percent = (100- (parseFloat(free) / parseFloat(total)) * 100).toFixed(0)
+		html += buildString("Volume " + i + " " + used_percent + "%", used_percent, "bar", 100, "green", "Total " + total + " GB<br />" + "Free " + free + " GB");
+	}
 	
 	return html;
 }
@@ -187,6 +195,27 @@ function formatNetinfo( text )
 	
 	SettingsManager.setValue( settingsObj.GroupName, "NASMACaddress", v_eth0Hwaddr);
 	SettingsManager.saveFile();
+}
+
+function formatDeviceinfoGetVol ( text )
+{
+	text = replaceWS(text);
+	
+	volnoA         = extractXMLValues2("volno", text);
+	cellA         = extractXMLValues2("cell", text);
+	
+	v_volumeCount = volnoA.length;
+	v_volumeArray = []
+	
+	// 8 cells per volume?!
+	for (var i = 0, j = 0; j < volnoA.length; i+=8, j++) {
+		debugOut("Volume [" + j + "] = " + volnoA[j]);
+		debugOut("\tTotal size = " + cellA[i+1]);
+		debugOut("\tFree size  = " + cellA[i+2]);
+		v_volumeArray.push([volnoA[j], parseFloat(cellA[i+1]), parseFloat(cellA[i+2])])
+	}
+	debugOut(v_volumeArray);
+	StatusData.innerHTML  = parseStatusData();
 }
 
 function buildString( title, value, format, pattern, style, tooltip )
