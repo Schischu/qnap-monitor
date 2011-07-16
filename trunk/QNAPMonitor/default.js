@@ -51,6 +51,7 @@ var stateTable =
 [
 	new StateObject("/cgi-bin/management/manaRequest.cgi", "subfunc=netinfo",  null,  null,  formatNetinfo, null, false),
 	new StateObject("/cgi-bin/management/manaRequest.cgi", "subfunc=sysinfo",  null,  null,  formatSysinfo, null, false),
+	new StateObject("/cgi-bin/disk/device_info.cgi",       "todo=get_vol",     null,  null,  formatDeviceinfoGetVol, null, false),
 ];
 var lastRefreshTime;
 var firmwareVersion;	// Nasty global - set by /goform/adv_status and read by LLTD status.

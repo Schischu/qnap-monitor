@@ -1,4 +1,5 @@
 
+
 // COMMON ->
 // sub model ->
 var v_modelName = ""; // <![CDATA[SS-839]]>
@@ -135,3 +136,9 @@ var v_freeSize = ""; // <![CDATA[1113]]>
 var v_eth_count = ""; // <![CDATA[2]]>
 // sub func ownContent <-
 // SYSMONITOR <-
+
+
+// DEVICEINFO ->
+// These are not real names but for our convenience
+var v_volumeCount = 0;
+var v_volumeArray = [];
