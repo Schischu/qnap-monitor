@@ -33,11 +33,11 @@ var nasObject =
 					command += "?id=" +this.seqNum++;	// Add a once-only number to bypass IE7 cacheing.
 				 
 				var url = "http://";
-				if (SettingsManager.getValue(settingsObj.GroupName, "NASSecureLogin") == "true")
+				if (SettingsManager.getValue(settingsObj.GroupName, "NASSecureLogin").toLowerCase() == "true")
 					var url = "https://";
 				url = url + SettingsManager.getValue( settingsObj.GroupName, "NASaddress" );
 				
-				if (SettingsManager.getValue(settingsObj.GroupName, "NASSecureLogin") == "true") {
+				if (SettingsManager.getValue(settingsObj.GroupName, "NASSecureLogin").toLowerCase() == "true") {
 					port = SettingsManager.getValue( settingsObj.GroupName, "NASportSSL" );
 					if(port != "80")
 						url = url + ":" + port;

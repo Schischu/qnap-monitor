@@ -22,7 +22,7 @@ function replaceWS(text)
 /// </summary>
 function parseStatusData()
 {
-	html = "";
+	html = "<div style='overflow-y:auto; height:158px; '; ";
 	//                  TITLE,          VAR,                                                         FORMAT, PATTERN, STYLE,           TOOLTIP
 	html += buildString("",             v_modelName + " [" + v_platform + "]",                          "text", "", "padding-top:2px", "Internal Model Name: " + v_internalModelName);
 	html += buildString("FW",           v_version + " " + v_build,                                      "text", "", "color:Khaki",     "Firmware");
@@ -39,7 +39,7 @@ function parseStatusData()
 		used_percent = (100- (parseFloat(free) / parseFloat(total)) * 100).toFixed(0)
 		html += buildString("Volume " + i + " " + used_percent + "%", used_percent, "bar", 100, "green", "Total " + total + " GB<br />" + "Free " + free + " GB");
 	}
-	
+	html += "</div>";
 	return html;
 }
 
