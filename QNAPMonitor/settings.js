@@ -66,7 +66,7 @@ var settingsObj =
 					if (fields[field].type == "checkbox") {
 						value = SettingsManager.getValue(this.GroupName, id, fields[field].checked);
 						debugOut("settings: " + id + " = " + value);
-						if (value == "true")
+						if (value.toLowerCase() == "true")
 							fields[field].checked = value;
 						else
 							fields[field].checked = null;
